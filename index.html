@@ -86,12 +86,34 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ac2);outline-off
 .blk{border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.15)}
 .nm{font-weight:600}
 li{border-radius:0}
+
+/* ===== デザイン強化2 ===== */
+.me{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:8px 12px;background:var(--sf);border-radius:14px;box-shadow:var(--sh);line-height:1.3}
+.me .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;background:linear-gradient(135deg,var(--ac),#e64980);flex:none}
+.me .bdg{margin-left:auto;font-size:11px;font-weight:700;color:#fff;background:#7048e8;border-radius:999px;padding:2px 10px}
+.ph{display:flex;align-items:center;gap:12px;margin:2px 0 12px;padding:12px 14px;border-radius:14px;background:var(--sf);box-shadow:var(--sh);border-left:8px solid var(--ac)}
+.ph .ic{font-size:28px;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#fff1e6,#ffe3ec)}
+.ph b{font-size:17px}.ph span:not(.ic){font-size:12px;color:var(--mut)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ph .ic{background:linear-gradient(135deg,#3a2517,#3a1a28)}}
+section{animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.seg{flex-wrap:wrap;gap:6px}
+.seg button{border-radius:999px!important;box-shadow:var(--sh);font-weight:600}
+h2{position:relative;padding-left:12px}
+h2:before{content:"";position:absolute;left:0;top:15%;bottom:15%;width:5px;border-radius:3px;background:linear-gradient(var(--ac),#e64980)}
+#ft{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:36px 0 24px;padding-top:16px;border-top:1px dashed var(--ln)}
+.lo{border:1px solid var(--ln);background:transparent;color:var(--mut);border-radius:999px;padding:6px 16px;font-size:13px}
+.lo.y{background:#e5484d;border-color:#e5484d;color:#fff;font-weight:700}
+li{border-left:4px solid transparent}li.cur{border-left-color:var(--ac)}
+ul{border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
+.grid{border-radius:14px}
+.tk summary{cursor:pointer;font-weight:700}
 </style></head><body><div id="gt" style="max-width:900px;margin:0 auto;padding:12px"><p class="note">読み込み中…</p></div>
 <main id="app" hidden>
 <h1>大学祭 運営管理</h1>
-<div id="mebar"></div><div id="nbar"></div>
-<div class="tabs"><button class="tab" id="t5" onclick="tab(5)">タスク</button><button class="tab" id="t2" onclick="tab(2)">マイページ</button><button class="tab" id="t7" onclick="tab(7)">予算</button><button class="tab" id="t6" onclick="tab(6)">お知らせ</button><button class="tab" id="t4" onclick="tab(4)">入力</button></div>
-<div class="tabs"><span class="note" style="margin:0;align-self:center">当日シフト</span><button class="tab" id="t1" onclick="tab(1)">全体シフト</button><button class="tab" id="t3" onclick="tab(3)">ヘルプ募集</button></div>
+<div id="mebar"></div><div id="ph"></div><div id="nbar"></div>
+<div class="tabs"><button class="tab" id="t5" onclick="tab(5)">✅ タスク</button><button class="tab" id="t2" onclick="tab(2)">🙋 マイページ</button><button class="tab" id="t7" onclick="tab(7)">💰 予算</button><button class="tab" id="t6" onclick="tab(6)">📢 お知らせ</button><button class="tab" id="t4" onclick="tab(4)">✏️ 入力</button></div>
+<div class="tabs"><span class="note" style="margin:0;align-self:center">当日シフト</span><button class="tab" id="t1" onclick="tab(1)">🗓️ 全体シフト</button><button class="tab" id="t3" onclick="tab(3)">🆘 ヘルプ募集</button></div>
 <div class="row" id="ctl"><div class="seg" style="margin:0"><button id="d0" class="on" onclick="setDay(0)">1日目</button><button id="d1" onclick="setDay(1)">2日目</button></div>
 <label>仮の現在時刻 <select id="ns" onchange="now=+this.value;draw()"></select></label></div>
 <section id="v1"><div class="chips" id="chips"></div><div class="grid" id="grid"></div>
@@ -103,6 +125,7 @@ li{border-radius:0}
 <section id="v5" hidden><div id="tk"></div><p class="note">タスクは期限の近い順に並びます。担当者を決めると、その人のマイページに表示されます。担当者を決めない場合は、その部門(または全体)のメンバー全員に表示されます。</p></section>
 <section id="v4" hidden><div class="seg" id="sb" style="flex-wrap:wrap"></div><div class="note" id="mg"></div><div id="ed"></div>
 <p class="note">入力した内容は保存され、全員の画面に反映されます。時間は9:00〜18:00の範囲で表示されます。</p></section>
+<div id="ft"></div>
 </main>
 <div id="tst" class="ann" hidden style="position:fixed;left:12px;right:12px;bottom:12px;z-index:9;margin:0"></div>
 <script>
@@ -135,7 +158,7 @@ function tab(n){if(!ADMIN&&(n==4||n==7))n=5;cur=n;[1,2,3,4,5,6,7].forEach(i=>{do
 function setDay(n){day=n;d0.className=n?'':'on';d1.className=n?'on':'';draw()}
 function setDept(n){dept=n;draw()}
 function tog(k){done.has(k)?done.delete(k):done.add(k);draw()}
-function draw(){t4.hidden=!ADMIN;t7.hidden=!ADMIN;ps.closest('.row').hidden=!ADMIN;DB.K=DB.K||[];DB.A=DB.A||[];DB.B=DB.B||[];DB.bg=DB.bg||{};ctl.hidden=![1,2,3].includes(cur)&&!(cur==4&&(sub==2||sub==3));DB.K.forEach(k=>{if(!k.ps)k.ps=k.p>=0?[k.p]:[];if(!k.cl)k.cl=[];if(k.pr==null)k.pr=1});{const u=DB.A.filter(a=>!a.r.includes(person)).length;t6.textContent='お知らせ'+(u?'('+u+')':'')}if(!DB.P.some(p=>p.id==person))person=(DB.P[0]||{}).id;if(!DB.D.some(d=>d.id==qd))qd=(DB.D[0]||{}).id;if(dept>=0&&!DB.D.some(d=>d.id==dept))dept=-1;
+function draw(){t4.hidden=!ADMIN;t7.hidden=!ADMIN;ps.closest('.row').hidden=!ADMIN;DB.K=DB.K||[];DB.A=DB.A||[];DB.B=DB.B||[];DB.bg=DB.bg||{};ctl.hidden=![1,2,3].includes(cur)&&!(cur==4&&(sub==2||sub==3));DB.K.forEach(k=>{if(!k.ps)k.ps=k.p>=0?[k.p]:[];if(!k.cl)k.cl=[];if(k.pr==null)k.pr=1});{const u=DB.A.filter(a=>!a.r.includes(person)).length;t6.textContent='📢 お知らせ'+(u?'('+u+')':'')}if(!DB.P.some(p=>p.id==person))person=(DB.P[0]||{}).id;if(!DB.D.some(d=>d.id==qd))qd=(DB.D[0]||{}).id;if(dept>=0&&!DB.D.some(d=>d.id==dept))dept=-1;
 ps.innerHTML=popts();[grid_,my_,help_,edit_,task_,notice_,budget_][cur-1]();topbar()}
 const hdr='<div class="rw hd"><div class="nm" style="border-left-color:transparent"></div><div class="tr">'+Array.from({length:9},(_,i)=>'<span>'+(9+i)+':00</span>').join('')+'</div></div>';
 const nowln=()=>'<div class="now" style="left:'+(96+(now-540)*1.2)+'px"></div>';
@@ -272,11 +295,15 @@ let h=(evn!=null?'<div class="er"><b>'+(evn>=0?'本番まであと'+evn+'日':'�
 const l=DB.K.filter(k=>tdept==-2||k.d==tdept).sort(byDue);
 h+=l.length?l.map(k=>{const v=Math.round(pk(k)*100),nm=k.ps.map(x=>{const q=DB.P.find(p=>p.id==x);return q?esc(q.n):''}).filter(Boolean).join('、');return'<div class="tk'+(late(k)?' late':'')+(k.s==2?' dn':'')+'" style="--h:'+(k.d<0?210:hu(k.d))+'"><div class="er"><b style="flex:1">'+esc(k.t)+'</b><span class="due'+(late(k)?' late':'')+'">'+(k.pr==2?'【優先】':'')+(k.s==2?'完了':dueT(k))+'</span></div><div class="due">担当: '+(nm||'未定')+'・'+v+'%</div>'+(k.m?'<div style="white-space:pre-wrap;font-size:13px;margin-top:4px">'+esc(k.m)+'</div>':'')+'</div>'}).join(''):'<p class="note">タスクはまだありません。</p>';
 tk.innerHTML=h}
-function topbar(){const m=DB.P.find(p=>p.id==ME);
-mebar.innerHTML='<div class="er"><b>'+(m?esc(m.n)+'('+esc(dn(m.d))+')':'')+'</b>'+(ADMIN?'<span class="due">管理者</span>':'')+'<button onclick="FB.logout()">ログアウト</button></div>';
-if(!m){nbar.innerHTML='';t2.textContent='マイページ';return}
+const PH={5:['✅','タスク','期限の近い順。担当と進み具合を確認'],2:['🙋','マイページ','あなたのタスクと当日のシフト'],7:['💰','予算','部門ごとの予算と支出(管理者のみ)'],6:['📢','お知らせ','連絡事項。読んだら「読みました」を押す'],4:['✏️','入力','部門・メンバー・シフトなどの設定'],1:['🗓️','全体シフト','みんなの当日シフト'],3:['🆘','ヘルプ募集','人手が足りない部門と時間']};
+function ph_(){const p=PH[cur];if(!p){ph.innerHTML='';return}ph.innerHTML='<div class="ph"><span class="ic">'+p[0]+'</span><div><b>'+p[1]+'</b><br><span>'+p[2]+'</span></div></div>';document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.id=='t'+cur))}
+let loStep=0;function lo(n){loStep=n;ft_()}
+function ft_(){ft.innerHTML=loStep?'<span class="note" style="margin:0">本当にログアウトしますか?</span><button class="lo y" onclick="FB.logout()">ログアウトする</button><button class="lo" onclick="lo(0)">やめる</button>':'<button class="lo" onclick="lo(1)">ログアウト</button>'}
+function topbar(){ft_();const m=DB.P.find(p=>p.id==ME);
+mebar.innerHTML=m?'<div class="me"><span class="av">'+esc(m.n.slice(0,1))+'</span><span><b>'+esc(m.n)+'</b><br><span class="due">'+esc(dn(m.d))+'</span></span>'+(ADMIN?'<span class="bdg">管理者</span>':'')+'</div>':(ADMIN?'<div class="me"><span class="av">管</span><b>管理者</b></div>':'');
+if(!m){nbar.innerHTML='';t2.textContent='🙋 マイページ';ph_();return}
 const l=DB.K.filter(k=>k.s<2&&k.due&&dd(k.due)<=3&&(k.ps.includes(m.id)||(!k.ps.length&&(k.d<0||k.d==m.d)))).sort(byDue);
-t2.textContent='マイページ'+(l.length?'('+l.length+')':'');
+t2.textContent='🙋 マイページ'+(l.length?'('+l.length+')':'');ph_();
 nbar.innerHTML=l.length?'<div class="ann" style="cursor:pointer;border-left:6px solid #e5484d" onclick="tab(2)"><b>期限が近いタスク '+l.length+'件</b>(3日以内・期限切れ)'+l.slice(0,3).map(k=>'<br>'+esc(k.t)+' <span class="due'+(late(k)?' late':'')+'">'+dueT(k)+'</span>').join('')+(l.length>3?'<br><span class="due">ほか'+(l.length-3)+'件</span>':'')+'</div>':''}
 tab(5);
 draw();
