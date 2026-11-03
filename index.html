@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>大学祭 運営管理</title>
+<style>
+:root{--bg:#f2f5f8;--sf:#fff;--ink:#16222e;--mut:#5d6b79;--ln:#dbe2e9;--ac:#0f6b8f;--bgl:82%;--fgl:18%;--ml:36%;--hl:#fff3c4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171e;--sf:#18222c;--ink:#e8eef3;--mut:#93a1ae;--ln:#2a3846;--ac:#5cc0e3;--bgl:30%;--fgl:92%;--ml:50%;--hl:#3b3413}}
+:root[data-theme="dark"]{--bg:#10171e;--sf:#18222c;--ink:#e8eef3;--mut:#93a1ae;--ln:#2a3846;--ac:#5cc0e3;--bgl:30%;--fgl:92%;--ml:50%;--hl:#3b3413}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:15px/1.6 "Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;background:var(--bg)}
+main{max-width:900px;margin:0 auto;padding:12px}
+h1{font-size:18px;margin:4px 0 10px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+button,select,input{font:inherit;color:var(--ink)}
+input,select{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:6px 8px;min-width:0}
+.tab,.seg button,.er button,.add{border:1px solid var(--ln);background:var(--sf);padding:6px 12px;border-radius:8px;cursor:pointer}
+.on{background:var(--ac)!important;color:#fff!important;border-color:var(--ac)!important}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.seg{display:flex;margin-bottom:8px}.seg button{border-radius:0}.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.chip{flex:none;border:1px solid var(--ln);background:var(--sf);border-radius:999px;padding:3px 12px;font-size:13px;cursor:pointer;border-left:6px solid hsl(var(--h,200) 60% 50%)}
+.grid{overflow-x:auto;border:1px solid var(--ln);border-radius:10px;background:var(--sf)}
+.in{position:relative;width:744px}
+.rw{display:flex;border-bottom:1px solid var(--ln);height:40px}
+.hd{height:26px;font-size:11px;color:var(--mut)}
+.nm{position:sticky;left:0;z-index:2;width:96px;flex:none;background:var(--sf);border-right:1px solid var(--ln);padding:0 8px;display:flex;flex-direction:column;justify-content:center;line-height:1.25;font-size:13px;border-left:5px solid hsl(var(--h) 60% 50%)}
+.nm small{font-size:10px;color:var(--mut)}
+.tr{position:relative;width:648px;flex:none;background:repeating-linear-gradient(90deg,transparent 0 71px,var(--ln) 71px 72px)}
+.hd .tr{display:flex}.hd span{width:72px;flex:none;padding:4px 0 0 3px}
+.blk{position:absolute;top:4px;bottom:4px;border-radius:4px;font-size:10px;line-height:1.25;padding:2px 3px;overflow:hidden;white-space:nowrap;background:hsl(var(--h) 60% var(--bgl));color:hsl(var(--h) 45% var(--fgl))}
+.blk.b{background:var(--ln);color:var(--mut)}
+.blk.m{background:hsl(var(--h) 55% var(--ml));color:#fff}
+.hc{position:absolute;top:4px;bottom:4px;width:35px;border-radius:4px;font-size:11px;text-align:center;line-height:32px}
+.hc.ok{background:var(--ln);color:var(--mut)}
+.hc.ng{background:hsl(8 75% var(--bgl));color:hsl(8 55% var(--fgl));font-weight:700}
+.now{position:absolute;top:0;bottom:0;width:2px;background:#e5484d;z-index:3;pointer-events:none}
+.note{font-size:12px;color:var(--mut);margin:8px 0}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:16px;margin-bottom:12px;border-left:8px solid hsl(var(--h) 60% 50%)}
+.card .lb{font-size:12px;color:var(--mut)}
+.card .big{font-size:28px;font-weight:700;line-height:1.3;margin:2px 0}
+.ann{background:var(--hl);border-radius:8px;padding:8px 12px;font-size:14px;margin-bottom:12px}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--ln);font-size:14px;background:var(--sf)}
+li.cur{background:var(--hl);font-weight:600}
+li .t{width:96px;flex:none;color:var(--mut);font-weight:400}
+li.fin span.x{text-decoration:line-through;color:var(--mut)}
+.er{display:flex;gap:6px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.er input[type=text]{flex:1;min-width:90px}
+.er input[type=number]{width:64px}
+.er.w{padding-bottom:8px;border-bottom:1px solid var(--ln)}
+.tk{border:1px solid var(--ln);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--sf);border-left:6px solid hsl(var(--h) 60% 50%)}
+.tk .er{margin-bottom:6px}.tk.late{outline:2px solid #e5484d}.tk.dn{opacity:.6}
+.due{font-size:12px;color:var(--mut);white-space:nowrap}.due.late{color:#e5484d;font-weight:700}
+[hidden]{display:none!important}
+</style></head><body><div id="gt" style="max-width:900px;margin:0 auto;padding:12px"><p class="note">読み込み中…</p></div>
+<main id="app" hidden>
+<h1>大学祭 運営管理</h1>
+<div id="mebar"></div><div id="nbar"></div>
+<div class="tabs"><button class="tab" id="t5" onclick="tab(5)">タスク</button><button class="tab" id="t2" onclick="tab(2)">マイページ</button><button class="tab" id="t7" onclick="tab(7)">予算</button><button class="tab" id="t6" onclick="tab(6)">お知らせ</button><button class="tab" id="t4" onclick="tab(4)">入力</button></div>
+<div class="tabs"><span class="note" style="margin:0;align-self:center">当日シフト</span><button class="tab" id="t1" onclick="tab(1)">全体シフト</button><button class="tab" id="t3" onclick="tab(3)">ヘルプ募集</button></div>
+<div class="row" id="ctl"><div class="seg" style="margin:0"><button id="d0" class="on" onclick="setDay(0)">1日目</button><button id="d1" onclick="setDay(1)">2日目</button></div>
+<label>仮の現在時刻 <select id="ns" onchange="now=+this.value;draw()"></select></label></div>
+<section id="v1"><div class="chips" id="chips"></div><div class="grid" id="grid"></div>
+<p class="note">赤い線が現在時刻です。横にスクロールすると全時間帯を見られます。</p></section>
+<section id="v2" hidden><div class="row"><label>名前 <select id="ps" onchange="person=+this.value;draw()"></select></label></div><div id="my"></div></section>
+<section id="v3" hidden><div id="help"></div><p class="note">各マスは30分ごとの「必要人数 − 配置人数」です。赤い「+2」は2人不足、グレーの「OK」は足りています。必要人数を入れていない時間は空白です。</p></section>
+<section id="v7" hidden><div id="bd"></div></section>
+<section id="v6" hidden><div id="an"></div></section>
+<section id="v5" hidden><div id="tk"></div><p class="note">タスクは期限の近い順に並びます。担当者を決めると、その人のマイページに表示されます。担当者を決めない場合は、その部門(または全体)のメンバー全員に表示されます。</p></section>
+<section id="v4" hidden><div class="seg" id="sb" style="flex-wrap:wrap"></div><div class="note" id="mg"></div><div id="ed"></div>
+<p class="note">入力した内容は保存され、全員の画面に反映されます。時間は9:00〜18:00の範囲で表示されます。</p></section>
+</main>
+<div id="tst" class="ann" hidden style="position:fixed;left:12px;right:12px;bottom:12px;z-index:9;margin:0"></div>
+<script>
+const K='shiftdb2',Dn=['受付','模擬店','ステージ','設営','警備','広報','会計','装飾','救護','運営本部'];
+const T={受付:['来場者案内','パンフ配布'],模擬店:['調理補助','販売','在庫確認'],ステージ:['進行補助','音響確認'],設営:['テント設営','物品運搬'],警備:['会場巡回','駐輪場整理'],広報:['写真撮影','SNS投稿'],会計:['売上回収','釣銭準備'],装飾:['看板設置','装飾補修'],救護:['救護室待機','会場巡回'],運営本部:['連絡対応','物品管理']};
+const L=['正門','中庭','体育館','講義棟前','本部テント'];
+const N='佐藤 鈴木 高橋 田中 伊藤 渡辺 山本 中村 小林 加藤 吉田 山田 松本 井上 木村 林 清水 山口 斎藤 森 池田 橋本 阿部 石川 前田 藤田 小川 岡田 後藤 長谷川'.split(' ');
+const G='陽 蒼 凛 結 葵 蓮 湊 紬 樹 楓 悠 澪 颯 栞 瑛 花 薫 光 彩 渚 響 咲 慧 玲 旭 茜 航 梓 駿 凪'.split(' ');
+const r=s=>{s=Math.sin(s*9301+49297)*233280;return s-Math.floor(s)};
+const f=m=>Math.floor(m/60)+':'+String(m%60).padStart(2,'0');
+const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const tm=v=>{const a=(v||'').split(':');return a.length<2?null:+a[0]*60+ +a[1]};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function gen(p,dy){const o=[];let t=540+30*Math.floor(r(p.id*7+dy)*4),k=0;o.push([t,t+15,'集合','本部テント','m']);t+=15;
+while(t<1050){if(k==2){o.push([t,t+60,'休憩','','b']);t+=60;k++;continue}
+const e=Math.min(t+60+30*Math.floor(r(p.id*3+k+dy*11)*3),1080),tk=T[Dn[p.d]];o.push([t,e,tk[(k+dy)%tk.length],L[(p.id+k)%5],'w']);t=e;k++}return o}
+function sample(){const db={D:Dn.map((n,i)=>({id:i,n})),P:N.map((n,i)=>({id:i,n:n+' '+G[i],d:i%10})),S:{},Q:{},nx:100};
+db.P.sort((a,b)=>a.d-b.d);db.P.forEach(p=>[0,1].forEach(y=>db.S[p.id+'-'+y]=gen(p,y)));
+Dn.forEach((_,d)=>[0,1].forEach(y=>db.Q[d+'-'+y]=[[540,720,3],[720,900,2],[900,1080,3]]));return db}
+function load(){try{const s=localStorage.getItem(K);if(s){const d=JSON.parse(s);if(d&&d.D&&d.P)return d}}catch(e){}return sample()}
+let DB={D:[],P:[],S:{},Q:{},K:[],A:[],B:[],bg:{},cf:0,ev:''},day=0,now=630,dept=-1,person=(DB.P[0]||{}).id,qd=(DB.D[0]||{}).id,cur=1,sub=0,msg='',arm='';const done=new Set();
+const sv=()=>{persist();draw()};
+const hu=id=>{const i=DB.D.findIndex(d=>d.id==id);return i<0?0:Math.round(i*360/DB.D.length)};
+const dn=id=>(DB.D.find(d=>d.id==id)||{n:''}).n;
+const dopts=s=>DB.D.map(d=>'<option value="'+d.id+'"'+(d.id==s?' selected':'')+'>'+esc(d.n)+'</option>').join('');
+const popts=()=>DB.P.map(p=>'<option value="'+p.id+'"'+(p.id==person?' selected':'')+'>'+esc(p.n)+'('+esc(dn(p.d))+')</option>').join('');
+const sorted=()=>DB.P.slice().sort((a,b)=>DB.D.findIndex(d=>d.id==a.d)-DB.D.findIndex(d=>d.id==b.d));
+ns.innerHTML=Array.from({length:37},(_,i)=>'<option value="'+(540+i*15)+'"'+(540+i*15==630?' selected':'')+'>'+f(540+i*15)+'</option>').join('');
+function tab(n){if(!ADMIN&&(n==4||n==7))n=5;cur=n;[1,2,3,4,5,6,7].forEach(i=>{document.getElementById('v'+i).hidden=n!=i;document.getElementById('t'+i).className='tab'+(n==i?' on':'')});draw()}
+function setDay(n){day=n;d0.className=n?'':'on';d1.className=n?'on':'';draw()}
+function setDept(n){dept=n;draw()}
+function tog(k){done.has(k)?done.delete(k):done.add(k);draw()}
+function draw(){t4.hidden=!ADMIN;t7.hidden=!ADMIN;ps.closest('.row').hidden=!ADMIN;DB.K=DB.K||[];DB.A=DB.A||[];DB.B=DB.B||[];DB.bg=DB.bg||{};ctl.hidden=![1,2,3].includes(cur)&&!(cur==4&&(sub==2||sub==3));DB.K.forEach(k=>{if(!k.ps)k.ps=k.p>=0?[k.p]:[];if(!k.cl)k.cl=[];if(k.pr==null)k.pr=1});{const u=DB.A.filter(a=>!a.r.includes(person)).length;t6.textContent='お知らせ'+(u?'('+u+')':'')}if(!DB.P.some(p=>p.id==person))person=(DB.P[0]||{}).id;if(!DB.D.some(d=>d.id==qd))qd=(DB.D[0]||{}).id;if(dept>=0&&!DB.D.some(d=>d.id==dept))dept=-1;
+ps.innerHTML=popts();[grid_,my_,help_,edit_,task_,notice_,budget_][cur-1]();topbar()}
+const hdr='<div class="rw hd"><div class="nm" style="border-left-color:transparent"></div><div class="tr">'+Array.from({length:9},(_,i)=>'<span>'+(9+i)+':00</span>').join('')+'</div></div>';
+const nowln=()=>'<div class="now" style="left:'+(96+(now-540)*1.2)+'px"></div>';
+const SH=(p,y)=>DB.S[p.id+'-'+y]||[];
+function grid_(){const ck=ADMIN?checks().length:0;chips.innerHTML=(ck?'<button class="chip" style="border-color:#e5484d;color:#e5484d" onclick="sub=5;tab(4)">⚠ 注意'+ck+'件</button>':'')+'<button class="chip'+(dept<0?' on':'')+'" onclick="setDept(-1)">全部門</button>'+DB.D.map(d=>'<button class="chip'+(dept==d.id?' on':'')+'" style="--h:'+hu(d.id)+'" onclick="setDept('+d.id+')">'+esc(d.n)+'</button>').join('');
+let h='<div class="in">'+hdr;if(!DB.P.length)h+='<p class="note" style="padding:0 10px">メンバーがいません。「入力」タブから追加してください。</p>';
+sorted().filter(p=>dept<0||p.d==dept).forEach(p=>{h+='<div class="rw" style="--h:'+hu(p.d)+'"><div class="nm">'+esc(p.n)+'<small>'+esc(dn(p.d))+'</small></div><div class="tr">'+SH(p,day).map(b=>{const a=Math.max(b[0],540),e=Math.min(b[1],1080);if(e<=a)return '';const w=(e-a)*1.2;return '<div class="blk '+b[4]+'" style="left:'+(a-540)*1.2+'px;width:'+(w-1)+'px" title="'+f(b[0])+' '+esc(b[2])+' '+esc(b[3])+'">'+(w>44?f(b[0])+'<br>'+esc(b[2]):'')+'</div>'}).join('')+'</div></div>'});
+grid.innerHTML=h+nowln()+'</div>'}
+function my_(){const p=DB.P.find(x=>x.id==person);if(!p){my.innerHTML='<p class="note">メンバーがいません。「入力」タブから追加してください。</p>';return}
+const bl=SH(p,day),i=bl.findIndex(b=>now>=b[0]&&now<b[1]),nx=bl.find(b=>b[0]>now);let a,s,m='';
+if(!bl.length){a='この日のシフトはありません';s='「入力」タブでシフトを追加できます'}
+else if(i>=0){const b=bl[i];a=b[4]=='b'?'休憩中':esc(b[2]);s=b[4]=='b'?'しっかり休んでください':(b[3]?'場所: '+esc(b[3]):'');m=f(b[0])+'〜'+f(b[1])+'(あと'+(b[1]-now)+'分)'}
+else if(now<bl[0][0]){a='シフト開始前';s=f(bl[0][0])+' に集合('+esc(bl[0][3])+')'}else{a='お疲れさまでした';s='この日のシフトは終わりです'}
+const nt=nx&&i>=0?'<div style="margin-top:6px">次は '+f(nx[0])+' '+(nx[4]=='b'?'休憩':esc(nx[2])+(nx[3]?'('+esc(nx[3])+')':''))+'</div>':'';
+my.innerHTML=myTasks(p)+'<h2 style="font-size:16px;margin:12px 0 8px">当日のシフト</h2><div class="card" style="--h:'+hu(p.d)+'"><div class="lb">'+esc(p.n)+'さんが今やること</div><div class="big">'+a+'</div><div>'+s+'</div><div class="lb" style="margin-top:4px">'+m+'</div>'+nt+'</div>'
++'<ul>'+bl.map((b,j)=>{const k=day+'-'+p.id+'-'+j,fin=done.has(k);return '<li class="'+(j==i?'cur':'')+(fin?' fin':'')+'"><span class="t">'+f(b[0])+'〜'+f(b[1])+'</span><span class="x">'+esc(b[2])+(b[3]?'('+esc(b[3])+')':'')+'</span>'+(b[4]=='w'?'<input type="checkbox" style="margin-left:auto;width:20px;height:20px" '+(fin?'checked':'')+' onchange="tog(\''+k+'\')">':'')+'</li>'}).join('')+'</ul>'}
+function help_(){const rows=DB.D.map(d=>{let tot=0,ns=0,c='';const Q=DB.Q[d.id+'-'+day]||[],ms=DB.P.filter(p=>p.d==d.id);
+for(let s=0;s<18;s++){const t=540+s*30,q=Q.filter(x=>x[0]<t+30&&x[1]>t).reduce((a,x)=>a+x[2],0);if(!q)continue;
+const a=ms.filter(p=>SH(p,day).some(b=>b[4]=='w'&&b[0]<t+30&&b[1]>t)).length,sh=Math.max(0,q-a);tot+=sh;if(now>=t&&now<t+30)ns=sh;
+c+='<div class="hc '+(sh?'ng':'ok')+'" style="left:'+s*36+'px" title="'+f(t)+' 必要'+q+'人 配置'+a+'人">'+(sh?'+'+sh:'OK')+'</div>'}return{d,tot,ns,c}});
+const hot=rows.filter(x=>x.ns).sort((a,b)=>b.ns-a.ns);
+let h='<div class="ann"><b>'+f(now)+' にヘルプがほしい部門</b><br>'+(hot.length?hot.map(x=>esc(x.d.n)+' '+x.ns+'人').join(' / '):'いま不足している部門はありません')+'</div><div class="grid"><div class="in">'+hdr;
+rows.forEach(x=>{h+='<div class="rw" style="--h:'+hu(x.d.id)+'"><div class="nm">'+esc(x.d.n)+'<small>不足 計'+x.tot+'人分</small></div><div class="tr">'+x.c+'</div></div>'});help.innerHTML=h+nowln()+'</div></div>'}
+/* 入力 */
+const L_=()=>DB.S[person+'-'+day]||(DB.S[person+'-'+day]=[]),Q_=()=>DB.Q[qd+'-'+day]||(DB.Q[qd+'-'+day]=[]);
+function addD(){DB.D.push({id:nid(),n:'新しい部門'});sv()}
+function delD(i){const d=DB.D[i];if(DB.P.some(p=>p.d==d.id)){msg='メンバーがいる部門は削除できません。先にメンバーを別の部門へ移すか削除してください。';draw();return}msg='';DB.D.splice(i,1);Object.keys(DB.Q).forEach(k=>{if(k.split('-')[0]==d.id)delete DB.Q[k]});sv()}
+function addP(){if(!DB.D.length){msg='先に部門を追加してください。';draw();return}msg='';const id=nid();DB.P.push({id,n:'新しいメンバー',d:DB.D[0].id});sv()}
+function delP(i){const p=DB.P[i];DB.P.splice(i,1);Object.keys(DB.S).forEach(k=>{if(k.split('-')[0]==p.id)delete DB.S[k]});sv()}
+function setB(i,k,v){const l=L_();if(k<2){const m=tm(v);if(m==null)return;l[i][k]=m}else l[i][k]=v;l.sort((a,b)=>a[0]-b[0]);sv()}
+function addB(){const l=L_(),t=l.length?Math.min(l[l.length-1][1],1020):540;l.push([t,t+60,'作業','','w']);sv()}
+function setQ(i,k,v){const l=Q_();if(k<2){const m=tm(v);if(m==null)return;l[i][k]=m}else l[i][k]=Math.max(0,Math.floor(+v||0));l.sort((a,b)=>a[0]-b[0]);sv()}
+function addQ(){const l=Q_(),t=l.length?Math.min(l[l.length-1][1],1020):540;l.push([t,t+60,2]);sv()}
+function ask(k){if(arm!=k){arm=k;msg='もう一度押すと、入力した内容がすべて置き換わります。';draw();return}arm='';msg='';DB=k=='s'?sample():{D:[],P:[],S:{},Q:{},nx:100};person=(DB.P[0]||{}).id;qd=(DB.D[0]||{}).id;sv()}
+const tin=(v,fn)=>'<input type="time" step="900" value="'+hm(v)+'" onchange="'+fn+'(this.value)">';
+function edit_(){sb.innerHTML=['部門','メンバー','シフト','必要人数','管理','チェック'].map((n,i)=>'<button class="'+(sub==i?'on':'')+'" onclick="sub='+i+';msg=\'\';arm=\'\';draw()">'+n+'</button>').join('');mg.textContent=msg;let h='';
+if(sub==0)h=DB.D.map((d,i)=>'<div class="er"><input type="text" value="'+esc(d.n)+'" onchange="DB.D['+i+'].n=this.value;sv()"><button onclick="delD('+i+')">削除</button></div>').join('')+'<button class="add" onclick="addD()">部門を追加</button>';
+if(sub==1)h=DB.P.map((p,i)=>'<div class="er"><input type="text" value="'+esc(p.n)+'" onchange="DB.P['+i+'].n=this.value;sv()"><select onchange="DB.P['+i+'].d=+this.value;sv()">'+dopts(p.d)+'</select><button onclick="delP('+i+')">削除</button></div>').join('')+'<button class="add" onclick="addP()">メンバーを追加</button>';
+if(sub==2){h=DB.P.length?'<div class="er"><select onchange="person=+this.value;draw()">'+popts()+'</select><span class="note">'+(day+1)+'日目のシフト(上のボタンで日を切り替え)</span></div>'+L_().map((b,i)=>'<div class="er w">'+tin(b[0],'setB.bind(null,'+i+',0)')+'〜'+tin(b[1],'setB.bind(null,'+i+',1)')+'<input type="text" value="'+esc(b[2])+'" placeholder="内容" onchange="setB('+i+',2,this.value)"><input type="text" value="'+esc(b[3])+'" placeholder="場所" onchange="setB('+i+',3,this.value)"><select onchange="setB('+i+',4,this.value)">'+[['w','作業'],['b','休憩'],['m','集合']].map(o=>'<option value="'+o[0]+'"'+(b[4]==o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select><button onclick="L_().splice('+i+',1);sv()">削除</button></div>').join('')+'<button class="add" onclick="addB()">シフトを追加</button>':'<p class="note">先にメンバーを追加してください。</p>'}
+if(sub==3){h=DB.D.length?'<div class="er"><select onchange="qd=+this.value;draw()">'+dopts(qd)+'</select><span class="note">'+(day+1)+'日目に必要な人数</span></div>'+Q_().map((q,i)=>'<div class="er w">'+tin(q[0],'setQ.bind(null,'+i+',0)')+'〜'+tin(q[1],'setQ.bind(null,'+i+',1)')+'<input type="number" min="0" value="'+q[2]+'" onchange="setQ('+i+',2,this.value)">人<button onclick="Q_().splice('+i+',1);sv()">削除</button></div>').join('')+'<button class="add" onclick="addQ()">時間帯を追加</button>':'<p class="note">先に部門を追加してください。</p>'}
+if(sub==4)h=adminUI();
+if(sub==5){const c=checks();h=c.length?'<ul>'+c.map(x=>'<li>⚠ '+esc(x)+'</li>').join('')+'</ul>':'<p class="note">注意が必要なシフトはありません。</p>'}
+ed.innerHTML=h}
+const TAS='width:100%;margin-bottom:6px;font:inherit;color:var(--ink);background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:6px 8px';
+const pk=k=>k.s==2?1:k.cl.length?k.cl.filter(c=>c.d).length/k.cl.length:k.s==1?.5:0;
+function progHTML(){if(!DB.K.length)return'';const g=[{n:'すべて',l:DB.K}].concat(DB.D.map(d=>({n:d.n,l:DB.K.filter(k=>k.d==d.id)}))).filter(x=>x.l.length);return'<div class="tk" style="--h:210"><b>進み具合</b>'+g.map(x=>{const v=Math.round(x.l.reduce((a,k)=>a+pk(k),0)/x.l.length*100);return'<div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="width:84px;font-size:13px">'+esc(x.n)+'</span><div style="flex:1;height:10px;background:var(--ln);border-radius:5px;overflow:hidden"><div style="width:'+v+'%;height:100%;background:var(--ac)"></div></div><span style="width:40px;text-align:right;font-size:13px">'+v+'%</span></div>'}).join('')+'<div class="note" style="margin:4px 0 0">完了は100%、進行中は50%、チェック項目があれば完了した割合で計算しています。</div></div>'}
+function clUI(k){const i=k.id;return'<div style="margin-bottom:6px">'+k.cl.map((c,j)=>'<div class="er" style="margin-bottom:4px"><input type="checkbox" style="width:20px;height:20px" '+(c.d?'checked':'')+' onchange="K_('+i+').cl['+j+'].d=this.checked;sv()"><input type="text" value="'+esc(c.t)+'" onchange="K_('+i+').cl['+j+'].t=this.value;sv()"><button onclick="K_('+i+').cl.splice('+j+',1);sv()">×</button></div>').join('')+'<button class="add" onclick="K_('+i+').cl.push({t:\'\',d:false});sv()">チェック項目を追加</button>'+(k.cl.length?' <span class="due">'+k.cl.filter(c=>c.d).length+'/'+k.cl.length+'</span>':'')+'</div>'}
+function checks(){const o=[];DB.P.forEach(p=>[0,1].forEach(y=>{const l=SH(p,y).slice().sort((a,b)=>a[0]-b[0]);let ws=null,w=0;l.forEach((b,i)=>{if(i&&b[0]<l[i-1][1])o.push(p.n+' '+(y+1)+'日目 '+f(b[0])+' のシフトが前のシフトと重なっています');if(b[4]=='b'||(i&&b[0]-l[i-1][1]>=30))ws=null;if(b[4]!='b'){if(ws==null)ws=b[0];if(b[1]-ws>360&&!w){w=1;o.push(p.n+' '+(y+1)+'日目 休憩なしで6時間を超えています')}}})}));return o}
+function postA(){const t=nt1.value.trim();if(!t)return;DB.A.unshift({id:nid(),t,b:nt2.value,d:+nt3.value,at:(n=>(n.getMonth()+1)+'/'+n.getDate()+' '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'))(new Date()),r:[]});sv()}
+function readA(id){const a=DB.A.find(x=>x.id==id);if(a&&person!=null&&person>=0&&!a.r.includes(person)){a.r.push(person);syncAll();FB.markRead(id,person).catch(fail);draw()}}
+function notice_(){const p=DB.P.find(x=>x.id==person);
+let h=(ADMIN?'<div class="er"><label>あなたは <select onchange="person=+this.value;draw()">'+popts()+'</select></label></div>':'')+'<details class="tk" style="--h:210"'+(ADMIN?'':' hidden')+'><summary>お知らせを投稿する</summary><div class="er" style="margin-top:8px"><input type="text" id="nt1" placeholder="タイトル"></div><textarea id="nt2" rows="3" placeholder="本文" style="'+TAS+'"></textarea><div class="er"><select id="nt3"><option value="-1">全体</option>'+dopts(-9)+'</select><button class="add" onclick="postA()">投稿</button></div></details>';
+const l=DB.A.filter(a=>!p||a.d<0||a.d==p.d);
+h+=l.length?l.map(a=>{const tg=DB.P.filter(x=>a.d<0||x.d==a.d),un=tg.filter(x=>!a.r.includes(x.id)),me=p&&a.r.includes(p.id);return'<div class="tk'+(me?' dn':'')+'" style="--h:'+(a.d<0?210:hu(a.d))+'"><div class="er"><b style="flex:1">'+esc(a.t)+'</b><span class="due">'+a.at+'・'+(a.d<0?'全体':esc(dn(a.d)))+'</span></div><div style="white-space:pre-wrap;font-size:14px;margin-bottom:6px">'+esc(a.b)+'</div><div class="er">'+(p?(me?'<span class="due">読みました済み</span>':'<button class="add on" onclick="readA('+a.id+')">読みました</button>'):'')+'<span class="due">既読 '+(tg.length-un.length)+'/'+tg.length+'</span>'+(ADMIN?'<button onclick="DB.A=DB.A.filter(x=>x.id!='+a.id+');sv()">削除</button>':'')+'</div>'+(un.length?'<details><summary class="due">未読の人('+un.length+')</summary><div style="font-size:13px">'+un.map(x=>esc(x.n)).join('、')+'</div></details>':'')+'</div>'}).join(''):'<p class="note">お知らせはまだありません。</p>';
+an.innerHTML=h}
+/* タスク */
+let tdept=-2;
+const K_=id=>DB.K.find(k=>k.id==id),T0=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
+const dd=s=>s?Math.round((new Date(s+'T00:00:00')-T0())/864e5):null;
+const dueT=k=>{const n=dd(k.due);return n==null?'期限なし':n<0?'期限切れ('+(-n)+'日前)':n==0?'今日まで':'あと'+n+'日'};
+const late=k=>k.s<2&&dd(k.due)!=null&&dd(k.due)<0;
+const byDue=(a,b)=>((a.s==2)-(b.s==2))||((a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9999')?1:(b.pr||0)-(a.pr||0));
+function taskBox(p){const l=DB.K.filter(k=>k.s<2&&(k.ps.includes(p.id)||(!k.ps.length&&(k.d<0||k.d==p.d)))).sort(byDue);return l.length?'<div class="ann"><b>当日までのタスク</b>'+l.map(k=>'<br>'+esc(k.t)+' <span class="due'+(late(k)?' late':'')+'">'+dueT(k)+'</span>'+(k.m?'<br><small style="white-space:pre-wrap">'+esc(k.m)+'</small>':'')).join('')+'</div>':''}
+function myTasks(p){const mine=DB.K.filter(k=>k.ps.includes(p.id)).sort(byDue),oth=DB.K.filter(k=>!k.ps.length&&k.s<2&&(k.d<0||k.d==p.d)).sort(byDue);
+const bar=k=>{const v=Math.round(pk(k)*100);return'<div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:10px;background:var(--ln);border-radius:5px;overflow:hidden"><div style="width:'+v+'%;height:100%;background:var(--ac)"></div></div><b style="width:44px;text-align:right;font-size:13px">'+v+'%</b></div>'};
+let h='<h2 style="font-size:16px;margin:4px 0 8px">'+esc(p.n)+'さんのタスク</h2>';
+h+=mine.length?mine.map(k=>{const i=k.id;return'<div class="tk'+(late(k)?' late':'')+(k.s==2?' dn':'')+'" style="--h:'+(k.d<0?210:hu(k.d))+'"><div class="er"><b style="flex:1">'+esc(k.t)+'</b><span class="due'+(late(k)?' late':'')+'">'+(k.pr==2?'【優先】':'')+(k.s==2?'完了':dueT(k))+'</span></div>'+bar(k)+'<div class="er" style="margin-top:6px"><select onchange="K_('+i+').s=+this.value;sv()">'+[[0,'未着手'],[1,'進行中'],[2,'完了']].map(x=>'<option value="'+x[0]+'"'+(k.s==x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><span class="note" style="margin:0">'+(k.cl.length?'チェック項目の完了数で割合を計算します':'未着手0%・進行中50%・完了100%')+'</span></div>'+clUI(k)+'<textarea rows="2" placeholder="メモ" style="'+TAS+'" onchange="K_('+i+').m=this.value;sv()">'+esc(k.m||'')+'</textarea></div>'}).join(''):'<p class="note">この人に振られたタスクはまだありません。「タスク」タブで担当者に追加すると、ここに出ます。</p>';
+if(oth.length)h+='<div class="ann"><b>部門のタスク(担当者未定)</b>'+oth.map(k=>'<br>'+esc(k.t)+' <span class="due'+(late(k)?' late':'')+'">'+dueT(k)+'</span>').join('')+'</div>';
+return h}
+function task_(){if(!ADMIN)return taskRO();const evn=dd(DB.ev),o=(v,t)=>'<option value="'+v+'"'+(v==tdept?' selected':'')+'>'+t+'</option>';
+let h='<div class="er"><label>大学祭の日 <input type="date" value="'+esc(DB.ev||'')+'" onchange="DB.ev=this.value;sv()"></label>'+(evn!=null?'<b>'+(evn>=0?'本番まであと'+evn+'日':'終了しました')+'</b>':'')+'</div>'
++'<div class="er"><select onchange="tdept=+this.value;draw()">'+o(-2,'すべての部門')+o(-1,'全体')+DB.D.map(d=>o(d.id,esc(d.n))).join('')+'</select><button class="add" onclick="DB.K.push({id:nid(),t:\'新しいタスク\',d:tdept<0?-1:tdept,ps:[],due:\'\',s:0});sv()">タスクを追加</button></div>';
+const l=DB.K.filter(k=>tdept==-2||k.d==tdept).sort(byDue);if(!l.length)h+='<p class="note">タスクはまだありません。「タスクを追加」を押してください。</p>';
+h+=l.map(k=>{const i=k.id;return '<div class="tk'+(late(k)?' late':'')+(k.s==2?' dn':'')+'" style="--h:'+(k.d<0?210:hu(k.d))+'"><div class="er"><input type="text" value="'+esc(k.t)+'" onchange="K_('+i+').t=this.value;sv()"><span class="due'+(late(k)?' late':'')+'">'+(k.pr==2?'【優先】':'')+(k.s==2?'完了':dueT(k))+'</span></div><textarea rows="2" placeholder="メモ" style="width:100%;margin-bottom:6px;font:inherit;color:var(--ink);background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:6px 8px" onchange="K_('+i+').m=this.value;sv()">'+esc(k.m||'')+'</textarea>'+clUI(k)+'<div class="er"><select onchange="K_('+i+').d=+this.value;K_('+i+').ps=[];sv()"><option value="-1"'+(k.d<0?' selected':'')+'>全体</option>'+dopts(k.d)+'</select>'+k.ps.map(x=>{const q=DB.P.find(p=>p.id==x);return q?'<button onclick="K_('+i+').ps=K_('+i+').ps.filter(y=>y!='+x+');sv()">'+esc(q.n)+' ×</button>':''}).join('')+'<select onchange="if(+this.value>=0){K_('+i+').ps.push(+this.value);sv()}"><option value="-1">担当者を追加</option>'+DB.P.filter(p=>(k.d<0||p.d==k.d)&&!k.ps.includes(p.id)).map(p=>'<option value="'+p.id+'">'+esc(p.n)+'</option>').join('')+'</select></div><div class="er"><input type="date" value="'+esc(k.due||'')+'" onchange="K_('+i+').due=this.value;sv()"><select onchange="K_('+i+').pr=+this.value;sv()">'+[[0,'優先度:低'],[1,'優先度:中'],[2,'優先度:高']].map(x=>'<option value="'+x[0]+'"'+(k.pr==x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><select onchange="K_('+i+').s=+this.value;sv()">'+[[0,'未着手'],[1,'進行中'],[2,'完了']].map(x=>'<option value="'+x[0]+'"'+(k.s==x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><button onclick="DB.K=DB.K.filter(k=>k.id!='+i+');sv()">削除</button></div></div>'}).join('');
+tk.innerHTML=h}
+const CAT={in:['会費','寄付','助成金','イベント収入','その他'],out:['備品費','消耗品費','印刷費','会場費','交通費','飲食費','通信費','謝礼','その他']};
+const yen=n=>'¥'+Math.round(n).toLocaleString('ja-JP'),B_=id=>DB.B.find(b=>b.id==id),todayS=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+let bdept=-2;
+function budget_(){const B=DB.B,sum=(l,ty)=>l.filter(b=>b.ty==ty).reduce((a,b)=>a+(+b.a||0),0),cf=+DB.cf||0,inc=sum(B,'in'),out=sum(B,'out'),o=(v,t)=>'<option value="'+v+'"'+(v==bdept?' selected':'')+'>'+t+'</option>';
+let h='<div class="tk" style="--h:210"><div class="er"><label>前年度からの繰越 ¥<input type="number" value="'+cf+'" style="width:110px" onchange="DB.cf=+this.value||0;sv()"></label></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:14px"><div>収入 <b>'+yen(inc)+'</b></div><div>支出 <b style="color:#e5484d">'+yen(out)+'</b></div><div>繰越を含む収入 <b>'+yen(cf+inc)+'</b></div><div>残高 <b>'+yen(cf+inc-out)+'</b></div></div></div>';
+h+='<div class="tk" style="--h:210"><b>部門ごとの予算枠</b>'+[{id:-1,n:'全体'}].concat(DB.D).map(x=>{const g=+DB.bg[x.id]||0,sp=sum(B.filter(b=>b.d==x.id),'out'),v=g?Math.min(100,Math.round(sp/g*100)):0;return'<div class="er" style="margin-top:6px"><span style="width:84px;font-size:13px">'+esc(x.n)+'</span>¥<input type="number" min="0" value="'+g+'" style="width:90px" onchange="DB.bg['+x.id+']=+this.value||0;sv()"><span class="due'+(g&&sp>g?' late':'')+'">支出 '+yen(sp)+'・'+(g?(sp>g?'超過 '+yen(sp-g):'残り '+yen(g-sp)):'予算枠なし')+'</span>'+(g?'<div style="flex-basis:100%;height:8px;background:var(--ln);border-radius:4px;overflow:hidden"><div style="width:'+v+'%;height:100%;background:'+(sp>g?'#e5484d':'var(--ac)')+'"></div></div>':'')+'</div>'}).join('')+'</div>';
+h+='<div class="er"><select onchange="bdept=+this.value;draw()">'+o(-2,'すべての部門')+o(-1,'全体')+DB.D.map(d=>o(d.id,esc(d.n))).join('')+'</select><button class="add" onclick="DB.B.push({id:nid(),ty:\'out\',c:\'備品費\',d:bdept<0?-1:bdept,a:0,dt:todayS(),m:\'\'});sv()">収支を追加</button></div>';
+const l=B.filter(b=>bdept==-2||b.d==bdept).slice().sort((a,b)=>a.dt<b.dt?1:a.dt>b.dt?-1:b.id-a.id);
+if(!l.length)h+='<p class="note">収支はまだありません。「収支を追加」を押してください。</p>';
+h+=l.map(b=>{const i=b.id;return'<div class="tk" style="--h:'+(b.ty=='in'?140:8)+'"><div class="er"><select onchange="B_('+i+').ty=this.value;B_('+i+').c=CAT[this.value][0];sv()"><option value="out"'+(b.ty=='out'?' selected':'')+'>支出</option><option value="in"'+(b.ty=='in'?' selected':'')+'>収入</option></select><select onchange="B_('+i+').c=this.value;sv()">'+CAT[b.ty].map(c=>'<option'+(c==b.c?' selected':'')+'>'+c+'</option>').join('')+'</select><select onchange="B_('+i+').d=+this.value;sv()"><option value="-1"'+(b.d<0?' selected':'')+'>全体</option>'+dopts(b.d)+'</select></div><div class="er">¥<input type="number" min="0" value="'+(+b.a||0)+'" style="width:110px" onchange="B_('+i+').a=+this.value||0;sv()"><input type="date" value="'+esc(b.dt||'')+'" onchange="B_('+i+').dt=this.value;sv()"><input type="text" placeholder="メモ" value="'+esc(b.m||'')+'" onchange="B_('+i+').m=this.value;sv()"><button onclick="DB.B=DB.B.filter(x=>x.id!='+i+');sv()">削除</button></div></div>'}).join('');
+bd.innerHTML=h}
+/* ===== 共有(Firebase)用 ===== */
+let ME=null,ADMIN=false,READY=false,USERS=[],ADMINS=[],LAST={},firstMe=true,loaded=false;
+const nid=()=>Date.now()*100+Math.floor(Math.random()*100);
+const js=JSON.stringify;
+const taskDoc=k=>({id:k.id,t:k.t||'',d:k.d==null?-1:k.d,ps:k.ps||[],due:k.due||'',pr:k.pr==null?1:k.pr,s:k.s||0,cl:(k.cl||[]).map(c=>({t:c.t||'',d:!!c.d})),m:k.m||''});
+const noticeDoc=a=>({id:a.id,t:a.t||'',b:a.b||'',d:a.d==null?-1:a.d,at:a.at||'',r:a.r||[]});
+const bdoc=b=>({id:b.id,ty:b.ty,c:b.c||'',d:b.d==null?-1:b.d,a:+b.a||0,dt:b.dt||'',m:b.m||''});
+function docsFromDB(){const o={};o['org/main']={D:DB.D.map(d=>({id:d.id,n:d.n})),P:DB.P.map(p=>({id:p.id,n:p.n,d:p.d})),ev:DB.ev||''};
+DB.K.forEach(k=>o['tasks/'+k.id]=taskDoc(k));DB.A.forEach(a=>o['notices/'+a.id]=noticeDoc(a));
+[0,1].forEach(y=>{const S={};DB.P.forEach(p=>{const l=DB.S[p.id+'-'+y];if(l&&l.length)S[p.id]=l.map(b=>({a:b[0],b:b[1],c:b[2],l:b[3],k:b[4]}))});o['shifts/day'+y]={S}});
+const Q={};Object.keys(DB.Q).forEach(k=>{if(DB.Q[k].length)Q[k]=DB.Q[k].map(q=>({a:q[0],b:q[1],n:q[2]}))});o['shifts/req']={Q};
+if(ADMIN){o['budget/main']={cf:+DB.cf||0,bg:DB.bg||{}};DB.B.forEach(b=>o['bentries/'+b.id]=bdoc(b))}
+return o}
+function syncAll(){const a=docsFromDB();LAST={};for(const p in a)LAST[p]=js(a[p])}
+function persist(){if(!READY||!window.FB)return;const a=docsFromDB();
+for(const p in a){const j=js(a[p]);if(LAST[p]!==j){LAST[p]=j;FB.set(p,a[p]).catch(fail)}}
+for(const p in LAST){if(!(p in a)){delete LAST[p];FB.del(p).catch(fail)}}}
+let tt;function toastMsg(m){const e=document.getElementById('tst');e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{e.hidden=true},6000)}
+function fail(e){console.error(e);toastMsg('保存できませんでした。'+(e&&e.code==='permission-denied'?'この操作をする権限がありません。':'通信状況を確認してください。'))}
+function showGate(h){gt.innerHTML=h;gt.hidden=false;app.hidden=true}
+function gateHide(){gt.hidden=true;app.hidden=false}
+function gateLoading(){showGate('<p class="note">読み込み中…</p>')}
+function gateLogin(msg){showGate('<div class="tk" style="--h:210"><h2 style="margin:0 0 8px;font-size:18px">大学祭 運営管理</h2><p>Googleアカウントでログインしてください。</p>'+(msg?'<p class="due late" style="white-space:normal">'+esc(msg)+'</p>':'')+'<button class="add on" onclick="FB.login()">Googleでログイン</button></div>')}
+function setOrgForGate(d){DB.D=(d&&d.D)||[];DB.P=(d&&d.P)||[]}
+function gateRegister(taken,msg){const free=DB.P.filter(p=>!taken.includes(p.id));
+showGate('<div class="tk" style="--h:210"><h2 style="margin:0 0 8px;font-size:18px">はじめての設定</h2><p>自分の名前を選んでください。選んだあとは、自分では変更できません(間違えたときは管理者に連絡してください)。</p>'+(msg?'<p class="due late" style="white-space:normal">'+esc(msg)+'</p>':'')+(free.length?'<div class="er"><select id="rg" style="flex:1">'+free.map(p=>'<option value="'+p.id+'">'+esc(p.n)+'('+esc(dn(p.d))+')</option>').join('')+'</select><button class="add on" onclick="FB.register(+rg.value)">この名前で登録</button></div>':'<p class="note">選べる名前がありません。管理者がメンバーを追加するまで待ってください。</p>')+(ADMIN?'<div class="er"><button class="add" onclick="FB.register(-1)">メンバー登録せず、管理者として入る</button></div>':'')+'<div class="er"><button onclick="FB.logout()">ログアウト</button></div></div>')}
+function setSession(pid,adm){ME=pid>=0?pid:null;ADMIN=!!adm}
+function applyMe(){const m=DB.P.find(p=>p.id==ME);if(m){person=m.id;tdept=m.d;dept=m.d}}
+function afterSnap(){if(!loaded)return;const ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)){setTimeout(afterSnap,1500);return}draw()}
+function onOrgSnap(d){DB.D=(d&&d.D)||[];DB.P=(d&&d.P)||[];DB.ev=(d&&d.ev)||'';if(firstMe){firstMe=false;applyMe()}syncAll();if(!loaded){loaded=true;READY=true;gateHide();draw();return}afterSnap()}
+function onTasksSnap(l){DB.K=l;syncAll();afterSnap()}
+function onNoticesSnap(l){DB.A=l.sort((a,b)=>b.id-a.id);syncAll();afterSnap()}
+function onShiftSnap(m){DB.S={};[0,1].forEach(y=>{const d=m['day'+y];if(d&&d.S)Object.keys(d.S).forEach(pid=>{DB.S[pid+'-'+y]=d.S[pid].map(o=>[o.a,o.b,o.c,o.l,o.k])})});DB.Q={};const r=m.req;if(r&&r.Q)Object.keys(r.Q).forEach(k=>{DB.Q[k]=r.Q[k].map(o=>[o.a,o.b,o.n])});syncAll();afterSnap()}
+function onBudgetSnap(d){DB.cf=(d&&d.cf)||0;DB.bg=(d&&d.bg)||{};syncAll();afterSnap()}
+function onBentries(l){DB.B=l;syncAll();afterSnap()}
+function onAdmins(d){ADMINS=(d&&d.emails)||[];afterSnap()}
+function onUsers(l){USERS=l;afterSnap()}
+function adminUI(){let h='<div class="tk" style="--h:210"><b>管理者</b><div class="note" style="margin:2px 0 6px">最初の管理者(masemase.gakusai@gmail.com)は外せません。管理者は、すべてのデータを編集できます。</div>'
++ADMINS.map((e,i)=>'<div class="er"><span style="flex:1">'+esc(e)+'</span><button onclick="adminDel('+i+')">外す</button></div>').join('')
++'<div class="er"><input type="text" id="ae" placeholder="追加するGoogleのメールアドレス"><button class="add" onclick="adminAdd()">追加</button></div></div>';
+h+='<div class="tk" style="--h:210"><b>登録済みのメンバー('+USERS.length+')</b><div class="note" style="margin:2px 0 6px">名前の選び間違いは「解除」すると、本人がもう一度選べます。</div>'+USERS.map(u=>{const p=DB.P.find(x=>x.id==u.pid);return'<div class="er"><span style="flex:1;font-size:13px">'+esc(p?p.n:'(メンバー登録なし)')+'<br><span class="due">'+esc(u.email||'')+'</span></span><button onclick="userDel(\''+u.uid+'\','+u.pid+')">解除</button></div>'}).join('')+'</div>';
+return h}
+function adminAdd(){const v=ae.value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){msg='メールアドレスの形式を確認してください。';draw();return}if(ADMINS.includes(v))return;ADMINS=ADMINS.concat([v]);FB.set('config/admins',{emails:ADMINS}).catch(fail);msg='';draw()}
+function adminDel(i){ADMINS=ADMINS.filter((_,j)=>j!=i);FB.set('config/admins',{emails:ADMINS}).catch(fail);draw()}
+function userDel(uid,pid){FB.del('users/'+uid).catch(fail);if(pid>=0)FB.del('claims/'+pid).catch(fail)}
+function taskRO(){const evn=dd(DB.ev),o=(v,t)=>'<option value="'+v+'"'+(v==tdept?' selected':'')+'>'+t+'</option>';
+let h=(evn!=null?'<div class="er"><b>'+(evn>=0?'本番まであと'+evn+'日':'終了しました')+'</b></div>':'')+'<div class="er"><select onchange="tdept=+this.value;draw()">'+o(-2,'すべての部門')+o(-1,'全体')+DB.D.map(d=>o(d.id,esc(d.n))).join('')+'</select></div>';
+const l=DB.K.filter(k=>tdept==-2||k.d==tdept).sort(byDue);
+h+=l.length?l.map(k=>{const v=Math.round(pk(k)*100),nm=k.ps.map(x=>{const q=DB.P.find(p=>p.id==x);return q?esc(q.n):''}).filter(Boolean).join('、');return'<div class="tk'+(late(k)?' late':'')+(k.s==2?' dn':'')+'" style="--h:'+(k.d<0?210:hu(k.d))+'"><div class="er"><b style="flex:1">'+esc(k.t)+'</b><span class="due'+(late(k)?' late':'')+'">'+(k.pr==2?'【優先】':'')+(k.s==2?'完了':dueT(k))+'</span></div><div class="due">担当: '+(nm||'未定')+'・'+v+'%</div>'+(k.m?'<div style="white-space:pre-wrap;font-size:13px;margin-top:4px">'+esc(k.m)+'</div>':'')+'</div>'}).join(''):'<p class="note">タスクはまだありません。</p>';
+tk.innerHTML=h}
+function topbar(){const m=DB.P.find(p=>p.id==ME);
+mebar.innerHTML='<div class="er"><b>'+(m?esc(m.n)+'('+esc(dn(m.d))+')':'')+'</b>'+(ADMIN?'<span class="due">管理者</span>':'')+'<button onclick="FB.logout()">ログアウト</button></div>';
+if(!m){nbar.innerHTML='';t2.textContent='マイページ';return}
+const l=DB.K.filter(k=>k.s<2&&k.due&&dd(k.due)<=3&&(k.ps.includes(m.id)||(!k.ps.length&&(k.d<0||k.d==m.d)))).sort(byDue);
+t2.textContent='マイページ'+(l.length?'('+l.length+')':'');
+nbar.innerHTML=l.length?'<div class="ann" style="cursor:pointer;border-left:6px solid #e5484d" onclick="tab(2)"><b>期限が近いタスク '+l.length+'件</b>(3日以内・期限切れ)'+l.slice(0,3).map(k=>'<br>'+esc(k.t)+' <span class="due'+(late(k)?' late':'')+'">'+dueT(k)+'</span>').join('')+(l.length>3?'<br><span class="due">ほか'+(l.length-3)+'件</span>':'')+'</div>':''}
+tab(5);
+draw();
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,getFirestore,doc,collection,onSnapshot,setDoc,getDoc,getDocs,deleteDoc,updateDoc,arrayUnion,writeBatch} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCTK7ys9TMJuqQK3R1CgQuE-lo4sWNylxg",authDomain:"gakusai-task-schedule.firebaseapp.com",projectId:"gakusai-task-schedule",storageBucket:"gakusai-task-schedule.firebasestorage.app",messagingSenderId:"654102176669",appId:"1:654102176669:web:3f71a4e66ae9ddfc0b8574"};
+const fbApp=initializeApp(cfg);
+let db;try{db=initializeFirestore(fbApp,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){db=getFirestore(fbApp)}
+const auth=getAuth(fbApp);
+const D=p=>doc(db,...p.split('/'));
+let unsubs=[],isAdm=false;
+const errL=e=>{console.error(e);toastMsg('読み込みに失敗しました。'+(e&&e.code==='permission-denied'?'権限がありません。':'通信状況を確認してください。'))};
+function startSync(){gateLoading();
+unsubs.push(onSnapshot(D('org/main'),s=>onOrgSnap(s.data()),errL));
+unsubs.push(onSnapshot(collection(db,'tasks'),s=>onTasksSnap(s.docs.map(d=>d.data())),errL));
+unsubs.push(onSnapshot(collection(db,'notices'),s=>onNoticesSnap(s.docs.map(d=>d.data())),errL));
+unsubs.push(onSnapshot(collection(db,'shifts'),s=>{const m={};s.docs.forEach(d=>{m[d.id]=d.data()});onShiftSnap(m)},errL));
+if(isAdm){
+unsubs.push(onSnapshot(D('budget/main'),s=>onBudgetSnap(s.data()),errL));
+unsubs.push(onSnapshot(collection(db,'bentries'),s=>onBentries(s.docs.map(d=>d.data())),errL));
+unsubs.push(onSnapshot(D('config/admins'),s=>onAdmins(s.data()),errL));
+unsubs.push(onSnapshot(collection(db,'users'),s=>onUsers(s.docs.map(d=>Object.assign({uid:d.id},d.data()))),errL));}}
+async function showRegister(msg){try{const o=await getDoc(D('org/main'));setOrgForGate(o.data());const c=await getDocs(collection(db,'claims'));gateRegister(c.docs.map(d=>+d.id),msg)}catch(e){gateLogin('読み込めませんでした: '+(e.code||e.message))}}
+async function enter(u){let us;try{us=await getDoc(D('users/'+u.uid))}catch(e){gateLogin('読み込めませんでした: '+(e.code||e.message));return}
+if(!us.exists()){setSession(-1,isAdm);await showRegister();return}
+setSession(us.data().pid,isAdm);startSync()}
+window.FB={
+login:async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'){signInWithRedirect(auth,new GoogleAuthProvider());return}gateLogin(e.code==='auth/unauthorized-domain'?'このアドレスはFirebaseで許可されていません。管理者に連絡してください。':'ログインできませんでした('+(e.code||e.message)+')')}},
+logout:()=>signOut(auth).then(()=>location.reload()),
+set:(p,o)=>setDoc(D(p),o),
+del:p=>deleteDoc(D(p)),
+markRead:(id,pid)=>updateDoc(D('notices/'+id),{r:arrayUnion(pid)}),
+register:async pid=>{const u=auth.currentUser;if(!u)return;try{const b=writeBatch(db);if(pid>=0)b.set(D('claims/'+pid),{uid:u.uid,email:u.email,at:Date.now()});b.set(D('users/'+u.uid),{email:u.email,pid:pid,at:Date.now()});await b.commit();await enter(u)}catch(e){console.error(e);await showRegister(e.code==='permission-denied'?'この名前はすでに使われています。別の名前を選ぶか、管理者に連絡してください。':'登録できませんでした。通信状況を確認してください。')}}
+};
+onAuthStateChanged(auth,async u=>{unsubs.forEach(f=>f());unsubs=[];
+if(!u){gateLogin();return}
+gateLoading();isAdm=false;
+try{await getDoc(D('config/admins'));isAdm=true}catch(e){if(e.code!=='permission-denied'){gateLogin('通信できませんでした。電波の良い場所で開き直してください。');return}}
+await enter(u)});
+</script></body></html>
