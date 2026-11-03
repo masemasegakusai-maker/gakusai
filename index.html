@@ -54,6 +54,38 @@ li.fin span.x{text-decoration:line-through;color:var(--mut)}
 .tk .er{margin-bottom:6px}.tk.late{outline:2px solid #e5484d}.tk.dn{opacity:.6}
 .due{font-size:12px;color:var(--mut);white-space:nowrap}.due.late{color:#e5484d;font-weight:700}
 [hidden]{display:none!important}
+
+/* ===== デザイン強化 ===== */
+:root{--ac:#e8590c;--ac2:#f59f00;--sh:0 2px 8px rgba(20,40,60,.08)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ac:#ff8a3d;--ac2:#ffc247;--sh:0 2px 8px rgba(0,0,0,.4)}}
+body{background:linear-gradient(180deg,#fff1e6 0,var(--bg) 220px) no-repeat,var(--bg)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(180deg,#2a1b12 0,var(--bg) 220px) no-repeat,var(--bg)}}
+h1{font-size:20px;margin:6px 0 12px;padding:14px 16px;border-radius:14px;color:#fff;letter-spacing:.06em;background:linear-gradient(120deg,#e8590c,#f59f00 55%,#e64980);box-shadow:var(--sh)}
+h1:before{content:"🏮 "}
+.tabs{gap:8px;margin-bottom:10px}
+.tab{border-radius:999px!important;padding:7px 16px!important;font-weight:600;box-shadow:var(--sh);transition:transform .1s}
+.tab:active{transform:scale(.95)}
+.tab.on{background:linear-gradient(120deg,var(--ac),var(--ac2))!important;border-color:transparent!important}
+.tabs .note{font-weight:700;color:var(--ac)}
+.tk,.card,.grid,.ann{box-shadow:var(--sh)}
+.tk{border-radius:14px;padding:12px 14px;border-left-width:8px}
+.tk b{font-size:15px}
+.add{border-radius:10px;font-weight:600}
+.add.on{background:linear-gradient(120deg,var(--ac),var(--ac2))!important}
+.er button{border-radius:10px}
+.chip{box-shadow:var(--sh)}
+input,select{border-radius:10px;padding:8px 10px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ac2);outline-offset:1px}
+.ann{border-radius:12px;background:linear-gradient(120deg,#fff3c4,#ffe0cc);border-left:6px solid var(--ac)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ann{background:linear-gradient(120deg,#3b3413,#3b2413)}}
+.card .big{background:linear-gradient(120deg,var(--ac),#e64980);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tk.late{outline:2px solid #e5484d;background:linear-gradient(90deg,#fff0f0,var(--sf) 40%)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .tk.late{background:linear-gradient(90deg,#3a1a1c,var(--sf) 40%)}}
+.tk.dn{opacity:.55}
+.due{font-weight:600}
+.blk{border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.nm{font-weight:600}
+li{border-radius:0}
 </style></head><body><div id="gt" style="max-width:900px;margin:0 auto;padding:12px"><p class="note">読み込み中…</p></div>
 <main id="app" hidden>
 <h1>大学祭 運営管理</h1>
