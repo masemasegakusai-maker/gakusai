@@ -141,6 +141,7 @@ main{padding-bottom:96px}
 #bn button.on .i{background:linear-gradient(120deg,var(--ac),var(--ac2));filter:saturate(1.1)}
 #bn em{position:absolute;top:-2px;right:0;font-style:normal;font-size:10px;font-weight:700;color:#fff;background:#ff3d7f;border-radius:999px;min-width:16px;height:16px;line-height:16px;padding:0 4px}
 #bn button.on{background:transparent!important;color:var(--ac)!important}
+.bdg2{display:inline-block;min-width:20px;text-align:center;font-size:12px;font-weight:700;color:#fff;background:#ff3d7f;border-radius:999px;padding:0 7px;vertical-align:middle}
 </style></head><body><div id="gt" style="max-width:900px;margin:0 auto;padding:12px"><p class="note">読み込み中…</p></div>
 <main id="app" hidden>
 <h1>大学祭 運営管理</h1>
@@ -207,7 +208,7 @@ if(!bl.length){a='この日のシフトはありません';s='「入力」タブ
 else if(i>=0){const b=bl[i];a=b[4]=='b'?'休憩中':esc(b[2]);s=b[4]=='b'?'しっかり休んでください':(b[3]?'場所: '+esc(b[3]):'');m=f(b[0])+'〜'+f(b[1])+'(あと'+(b[1]-now)+'分)'}
 else if(now<bl[0][0]){a='シフト開始前';s=f(bl[0][0])+' に集合('+esc(bl[0][3])+')'}else{a='お疲れさまでした';s='この日のシフトは終わりです'}
 const nt=nx&&i>=0?'<div style="margin-top:6px">次は '+f(nx[0])+' '+(nx[4]=='b'?'休憩':esc(nx[2])+(nx[3]?'('+esc(nx[3])+')':''))+'</div>':'';
-my.innerHTML=myTasks(p)+'<h2 style="font-size:16px;margin:12px 0 8px">当日のシフト</h2><div class="card" style="--h:'+hu(p.d)+'"><div class="lb">'+esc(p.n)+'さんが今やること</div><div class="big">'+a+'</div><div>'+s+'</div><div class="lb" style="margin-top:4px">'+m+'</div>'+nt+'</div>'
+my.innerHTML=unreadA(p)+myTasks(p)+'<h2 style="font-size:16px;margin:12px 0 8px">当日のシフト</h2><div class="card" style="--h:'+hu(p.d)+'"><div class="lb">'+esc(p.n)+'さんが今やること</div><div class="big">'+a+'</div><div>'+s+'</div><div class="lb" style="margin-top:4px">'+m+'</div>'+nt+'</div>'
 +'<ul>'+bl.map((b,j)=>{const k=day+'-'+p.id+'-'+j,fin=done.has(k);return '<li class="'+(j==i?'cur':'')+(fin?' fin':'')+'"><span class="t">'+f(b[0])+'〜'+f(b[1])+'</span><span class="x">'+esc(b[2])+(b[3]?'('+esc(b[3])+')':'')+'</span>'+(b[4]=='w'?'<input type="checkbox" style="margin-left:auto;width:20px;height:20px" '+(fin?'checked':'')+' onchange="tog(\''+k+'\')">':'')+'</li>'}).join('')+'</ul>'}
 function help_(){const rows=DB.D.map(d=>{let tot=0,ns=0,c='';const Q=DB.Q[d.id+'-'+day]||[],ms=DB.P.filter(p=>p.d==d.id);
 for(let s=0;s<18;s++){const t=540+s*30,q=Q.filter(x=>x[0]<t+30&&x[1]>t).reduce((a,x)=>a+x[2],0);if(!q)continue;
@@ -242,6 +243,9 @@ function progHTML(){if(!DB.K.length)return'';const g=[{n:'すべて',l:DB.K}].co
 function clUI(k){const i=k.id;return'<div style="margin-bottom:6px">'+k.cl.map((c,j)=>'<div class="er" style="margin-bottom:4px"><input type="checkbox" style="width:20px;height:20px" '+(c.d?'checked':'')+' onchange="K_('+i+').cl['+j+'].d=this.checked;sv()"><input type="text" value="'+esc(c.t)+'" onchange="K_('+i+').cl['+j+'].t=this.value;sv()"><button onclick="K_('+i+').cl.splice('+j+',1);sv()">×</button></div>').join('')+'<button class="add" onclick="K_('+i+').cl.push({t:\'\',d:false});sv()">チェック項目を追加</button>'+(k.cl.length?' <span class="due">'+k.cl.filter(c=>c.d).length+'/'+k.cl.length+'</span>':'')+'</div>'}
 function checks(){const o=[];DB.P.forEach(p=>[0,1].forEach(y=>{const l=SH(p,y).slice().sort((a,b)=>a[0]-b[0]);let ws=null,w=0;l.forEach((b,i)=>{if(i&&b[0]<l[i-1][1])o.push(p.n+' '+(y+1)+'日目 '+f(b[0])+' のシフトが前のシフトと重なっています');if(b[4]=='b'||(i&&b[0]-l[i-1][1]>=30))ws=null;if(b[4]!='b'){if(ws==null)ws=b[0];if(b[1]-ws>360&&!w){w=1;o.push(p.n+' '+(y+1)+'日目 休憩なしで6時間を超えています')}}})}));return o}
 function postA(){const t=nt1.value.trim();if(!t)return;DB.A.unshift({id:nid(),t,b:nt2.value,d:+nt3.value,at:(n=>(n.getMonth()+1)+'/'+n.getDate()+' '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'))(new Date()),r:[]});sv()}
+function unreadA(p){const l=DB.A.filter(a=>(a.d<0||a.d==p.d)&&!a.r.includes(p.id));
+if(!l.length)return'';
+return'<h2 style="font-size:16px;margin:4px 0 8px">📢 未読のお知らせ <span class="bdg2">'+l.length+'</span></h2>'+l.map(a=>'<div class="tk" style="--h:'+(a.d<0?210:hu(a.d))+'"><div class="er"><b style="flex:1">'+esc(a.t)+'</b><span class="due">'+a.at+'・'+(a.d<0?'全体':esc(dn(a.d)))+'</span></div><div style="white-space:pre-wrap;font-size:14px;margin-bottom:8px">'+esc(a.b)+'</div><button class="add on" onclick="readA('+a.id+')">✔ 読みました</button></div>').join('')}
 function readA(id){const a=DB.A.find(x=>x.id==id);if(a&&person!=null&&person>=0&&!a.r.includes(person)){a.r.push(person);syncAll();FB.markRead(id,person).catch(fail);draw()}}
 function notice_(){const p=DB.P.find(x=>x.id==person);
 let h=(ADMIN?'<div class="er"><label>あなたは <select onchange="person=+this.value;draw()">'+popts()+'</select></label></div>':'')+'<details class="tk" style="--h:210"'+(ADMIN?'':' hidden')+'><summary>お知らせを投稿する</summary><div class="er" style="margin-top:8px"><input type="text" id="nt1" placeholder="タイトル"></div><textarea id="nt2" rows="3" placeholder="本文" style="'+TAS+'"></textarea><div class="er"><select id="nt3"><option value="-1">全体</option>'+dopts(-9)+'</select><button class="add" onclick="postA()">投稿</button></div></details>';
@@ -333,7 +337,7 @@ const PH={5:['✅','タスク','期限の近い順。担当と進み具合を確
 function ph_(){const p=PH[cur];if(!p){ph.innerHTML='';return}ph.innerHTML='<div class="ph"><span class="ic">'+p[0]+'</span><div><b>'+p[1]+'</b><br><span>'+p[2]+'</span></div></div>';document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.id=='t'+cur));
 if(cur==1||cur==3)ph.innerHTML+='<div class="seg" style="margin:0 0 10px"><button class="'+(cur==1?'on':'')+'" onclick="tab(1)">🗓️ 全体シフト</button><button class="'+(cur==3?'on':'')+'" onclick="tab(3)">🆘 ヘルプ募集</button></div>';nav_()}
 function nav_(){const c=t=>{const m=/\((\d+)\)/.exec(t.textContent);return m?m[1]:''};
-const it=[[5,'✅','タスク','',0],[2,'🙋','マイページ',c(t2),0],[6,'📢','お知らせ',c(t6),0],[1,'🗓️','シフト','',0],[7,'💰','予算','',1],[4,'✏️','入力','',1]].filter(x=>!x[4]||ADMIN);
+const it=[[2,'🙋','マイページ',c(t2),0],[5,'✅','タスク','',0],[6,'📢','お知らせ',c(t6),0],[1,'🗓️','シフト','',0],[7,'💰','予算','',1],[4,'✏️','入力','',1]].filter(x=>!x[4]||ADMIN);
 bn.innerHTML=it.map(x=>{const on=x[0]==cur||(x[0]==1&&cur==3);return'<button class="'+(on?'on':'')+'" onclick="tab('+x[0]+')"><span class="i">'+x[1]+(x[3]?'<em>'+x[3]+'</em>':'')+'</span><span class="l">'+x[2]+'</span></button>'}).join('')}
 let loStep=0;function lo(n){loStep=n;ft_()}
 function ft_(){ft.innerHTML=loStep?'<span class="note" style="margin:0">本当にログアウトしますか?</span><button class="lo y" onclick="FB.logout()">ログアウトする</button><button class="lo" onclick="lo(0)">やめる</button>':'<button class="lo" onclick="lo(1)">ログアウト</button>'}
@@ -343,7 +347,7 @@ if(!m){nbar.innerHTML='';t2.textContent='🙋 マイページ';ph_();return}
 const l=DB.K.filter(k=>k.s<2&&k.due&&dd(k.due)<=3&&(k.ps.includes(m.id)||(!k.ps.length&&(k.d<0||k.d==m.d)))).sort(byDue);
 t2.textContent='🙋 マイページ'+(l.length?'('+l.length+')':'');ph_();
 nbar.innerHTML=l.length?'<div class="ann" style="cursor:pointer;border-left:6px solid #e5484d" onclick="tab(2)"><b>期限が近いタスク '+l.length+'件</b>(3日以内・期限切れ)'+l.slice(0,3).map(k=>'<br>'+esc(k.t)+' <span class="due'+(late(k)?' late':'')+'">'+dueT(k)+'</span>').join('')+(l.length>3?'<br><span class="due">ほか'+(l.length-3)+'件</span>':'')+'</div>':''}
-tab(5);
+tab(2);
 draw();
 </script>
 <script type="module">
