@@ -108,6 +108,39 @@ li{border-left:4px solid transparent}li.cur{border-left-color:var(--ac)}
 ul{border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
 .grid{border-radius:14px}
 .tk summary{cursor:pointer;font-weight:700}
+
+/* ===== 青×ピンク + 下タブ ===== */
+:root{--bg:#f1f5ff;--ac:#2f6bff;--ac2:#ff5fa2;--ln:#dde5f5;--hl:#e6efff;--sh:0 2px 10px rgba(47,107,255,.12)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1424;--sf:#172038;--ac:#6c9bff;--ac2:#ff7ab8;--ln:#27324f;--hl:#1d2b52;--sh:0 2px 10px rgba(0,0,0,.45)}}
+body{background:linear-gradient(180deg,#e3ecff 0,#ffe6f1 150px,var(--bg) 330px) no-repeat,var(--bg)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(180deg,#16244d 0,#33183a 150px,var(--bg) 330px) no-repeat,var(--bg)}}
+h1{background:linear-gradient(120deg,#2f6bff,#8a5cff 55%,#ff5fa2)}
+h1:before{content:"🎪 "}
+main>.tabs{display:none!important}
+.tab.on,.add.on{background:linear-gradient(120deg,var(--ac),var(--ac2))!important}
+.on{border-color:transparent!important}
+.ann{background:linear-gradient(120deg,#e6efff,#ffe6f1);border-left-color:var(--ac2)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ann{background:linear-gradient(120deg,#1d2b52,#3a1d40)}}
+.ph{border-left-color:var(--ac2)}
+.ph .ic{background:linear-gradient(135deg,#e3ecff,#ffe0ee)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ph .ic{background:linear-gradient(135deg,#1d2b52,#3a1d40)}}
+.tk.late{background:linear-gradient(90deg,#ffe9f1,var(--sf) 40%);outline-color:#ff3d7f}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .tk.late{background:linear-gradient(90deg,#401a2e,var(--sf) 40%)}}
+.due.late{color:#e0245e}
+.seg button.on{background:linear-gradient(120deg,var(--ac),var(--ac2))!important}
+h2:before{background:linear-gradient(var(--ac),var(--ac2))}
+.card .big{background:linear-gradient(120deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text}
+main{padding-bottom:96px}
+#tst{bottom:84px!important}
+#bn{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--sf) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--ln);box-shadow:0 -4px 16px rgba(47,107,255,.10)}
+#bn[hidden]{display:none}
+#bn button{flex:1;max-width:110px;border:0;background:transparent;border-radius:14px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--mut);cursor:pointer}
+#bn .i{position:relative;font-size:21px;line-height:1.2;width:46px;height:30px;display:grid;place-items:center;border-radius:999px;transition:.15s}
+#bn .l{font-size:10px;font-weight:600}
+#bn button.on{color:var(--ac)}
+#bn button.on .i{background:linear-gradient(120deg,var(--ac),var(--ac2));filter:saturate(1.1)}
+#bn em{position:absolute;top:-2px;right:0;font-style:normal;font-size:10px;font-weight:700;color:#fff;background:#ff3d7f;border-radius:999px;min-width:16px;height:16px;line-height:16px;padding:0 4px}
+#bn button.on{background:transparent!important;color:var(--ac)!important}
 </style></head><body><div id="gt" style="max-width:900px;margin:0 auto;padding:12px"><p class="note">読み込み中…</p></div>
 <main id="app" hidden>
 <h1>大学祭 運営管理</h1>
@@ -126,6 +159,7 @@ ul{border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
 <section id="v4" hidden><div class="seg" id="sb" style="flex-wrap:wrap"></div><div class="note" id="mg"></div><div id="ed"></div>
 <p class="note">入力した内容は保存され、全員の画面に反映されます。時間は9:00〜18:00の範囲で表示されます。</p></section>
 <div id="ft"></div>
+<nav id="bn"></nav>
 </main>
 <div id="tst" class="ann" hidden style="position:fixed;left:12px;right:12px;bottom:12px;z-index:9;margin:0"></div>
 <script>
@@ -264,8 +298,8 @@ for(const p in a){const j=js(a[p]);if(LAST[p]!==j){LAST[p]=j;FB.set(p,a[p]).catc
 for(const p in LAST){if(!(p in a)){delete LAST[p];FB.del(p).catch(fail)}}}
 let tt;function toastMsg(m){const e=document.getElementById('tst');e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{e.hidden=true},6000)}
 function fail(e){console.error(e);toastMsg('保存できませんでした。'+(e&&e.code==='permission-denied'?'この操作をする権限がありません。':'通信状況を確認してください。'))}
-function showGate(h){gt.innerHTML=h;gt.hidden=false;app.hidden=true}
-function gateHide(){gt.hidden=true;app.hidden=false}
+function showGate(h){gt.innerHTML=h;gt.hidden=false;app.hidden=true;bn.hidden=true}
+function gateHide(){gt.hidden=true;app.hidden=false;bn.hidden=false}
 function gateLoading(){showGate('<p class="note">読み込み中…</p>')}
 function gateLogin(msg){showGate('<div class="tk" style="--h:210"><h2 style="margin:0 0 8px;font-size:18px">大学祭 運営管理</h2><p>Googleアカウントでログインしてください。</p>'+(msg?'<p class="due late" style="white-space:normal">'+esc(msg)+'</p>':'')+'<button class="add on" onclick="FB.login()">Googleでログイン</button></div>')}
 function setOrgForGate(d){DB.D=(d&&d.D)||[];DB.P=(d&&d.P)||[]}
@@ -296,7 +330,11 @@ const l=DB.K.filter(k=>tdept==-2||k.d==tdept).sort(byDue);
 h+=l.length?l.map(k=>{const v=Math.round(pk(k)*100),nm=k.ps.map(x=>{const q=DB.P.find(p=>p.id==x);return q?esc(q.n):''}).filter(Boolean).join('、');return'<div class="tk'+(late(k)?' late':'')+(k.s==2?' dn':'')+'" style="--h:'+(k.d<0?210:hu(k.d))+'"><div class="er"><b style="flex:1">'+esc(k.t)+'</b><span class="due'+(late(k)?' late':'')+'">'+(k.pr==2?'【優先】':'')+(k.s==2?'完了':dueT(k))+'</span></div><div class="due">担当: '+(nm||'未定')+'・'+v+'%</div>'+(k.m?'<div style="white-space:pre-wrap;font-size:13px;margin-top:4px">'+esc(k.m)+'</div>':'')+'</div>'}).join(''):'<p class="note">タスクはまだありません。</p>';
 tk.innerHTML=h}
 const PH={5:['✅','タスク','期限の近い順。担当と進み具合を確認'],2:['🙋','マイページ','あなたのタスクと当日のシフト'],7:['💰','予算','部門ごとの予算と支出(管理者のみ)'],6:['📢','お知らせ','連絡事項。読んだら「読みました」を押す'],4:['✏️','入力','部門・メンバー・シフトなどの設定'],1:['🗓️','全体シフト','みんなの当日シフト'],3:['🆘','ヘルプ募集','人手が足りない部門と時間']};
-function ph_(){const p=PH[cur];if(!p){ph.innerHTML='';return}ph.innerHTML='<div class="ph"><span class="ic">'+p[0]+'</span><div><b>'+p[1]+'</b><br><span>'+p[2]+'</span></div></div>';document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.id=='t'+cur))}
+function ph_(){const p=PH[cur];if(!p){ph.innerHTML='';return}ph.innerHTML='<div class="ph"><span class="ic">'+p[0]+'</span><div><b>'+p[1]+'</b><br><span>'+p[2]+'</span></div></div>';document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.id=='t'+cur));
+if(cur==1||cur==3)ph.innerHTML+='<div class="seg" style="margin:0 0 10px"><button class="'+(cur==1?'on':'')+'" onclick="tab(1)">🗓️ 全体シフト</button><button class="'+(cur==3?'on':'')+'" onclick="tab(3)">🆘 ヘルプ募集</button></div>';nav_()}
+function nav_(){const c=t=>{const m=/\((\d+)\)/.exec(t.textContent);return m?m[1]:''};
+const it=[[5,'✅','タスク','',0],[2,'🙋','マイページ',c(t2),0],[6,'📢','お知らせ',c(t6),0],[1,'🗓️','シフト','',0],[7,'💰','予算','',1],[4,'✏️','入力','',1]].filter(x=>!x[4]||ADMIN);
+bn.innerHTML=it.map(x=>{const on=x[0]==cur||(x[0]==1&&cur==3);return'<button class="'+(on?'on':'')+'" onclick="tab('+x[0]+')"><span class="i">'+x[1]+(x[3]?'<em>'+x[3]+'</em>':'')+'</span><span class="l">'+x[2]+'</span></button>'}).join('')}
 let loStep=0;function lo(n){loStep=n;ft_()}
 function ft_(){ft.innerHTML=loStep?'<span class="note" style="margin:0">本当にログアウトしますか?</span><button class="lo y" onclick="FB.logout()">ログアウトする</button><button class="lo" onclick="lo(0)">やめる</button>':'<button class="lo" onclick="lo(1)">ログアウト</button>'}
 function topbar(){ft_();const m=DB.P.find(p=>p.id==ME);
@@ -334,7 +372,7 @@ async function enter(u){let us;try{us=await getDoc(D('users/'+u.uid))}catch(e){g
 if(!us.exists()){setSession(-1,isAdm);await showRegister();return}
 setSession(us.data().pid,isAdm);startSync()}
 window.FB={
-login:async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'){signInWithRedirect(auth,new GoogleAuthProvider());return}gateLogin(e.code==='auth/unauthorized-domain'?'このアドレスはFirebaseで許可されていません。管理者に連絡してください。':'ログインできませんでした('+(e.code||e.message)+')')}},
+login:async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'){gateLogin('ポップアップがブロックされました。Safariの設定でポップアップを許可するか、LINEなどのアプリ内ブラウザではなくSafari(またはChrome)でURLを開いて、もう一度押してください。');return}if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gateLogin();return}gateLogin(e.code==='auth/unauthorized-domain'?'このアドレスはFirebaseで許可されていません。管理者に連絡してください。':'ログインできませんでした('+(e.code||e.message)+')')}},
 logout:()=>signOut(auth).then(()=>location.reload()),
 set:(p,o)=>setDoc(D(p),o),
 del:p=>deleteDoc(D(p)),
