@@ -290,7 +290,7 @@ if(!l.length)h+='<p class="note">収支はまだありません。「収支を�
 h+=l.map(b=>{const i=b.id;return'<div class="tk" style="--h:'+(b.ty=='in'?140:8)+'"><div class="er"><select onchange="B_('+i+').ty=this.value;B_('+i+').c=CAT[this.value][0];sv()"><option value="out"'+(b.ty=='out'?' selected':'')+'>支出</option><option value="in"'+(b.ty=='in'?' selected':'')+'>収入</option></select><select onchange="B_('+i+').c=this.value;sv()">'+CAT[b.ty].map(c=>'<option'+(c==b.c?' selected':'')+'>'+c+'</option>').join('')+'</select><select onchange="B_('+i+').d=+this.value;sv()"><option value="-1"'+(b.d<0?' selected':'')+'>全体</option>'+dopts(b.d)+'</select></div><div class="er">¥<input type="number" min="0" value="'+(+b.a||0)+'" style="width:110px" onchange="B_('+i+').a=+this.value||0;sv()"><input type="date" value="'+esc(b.dt||'')+'" onchange="B_('+i+').dt=this.value;sv()"><input type="text" placeholder="メモ" value="'+esc(b.m||'')+'" onchange="B_('+i+').m=this.value;sv()"><button onclick="DB.B=DB.B.filter(x=>x.id!='+i+');sv()">削除</button></div></div>'}).join('');
 bd.innerHTML=h}
 /* ===== 共有(Firebase)用 ===== */
-let ME=null,ADMIN=false,READY=false,USERS=[],ADMINS=[],LAST={},firstMe=true,loaded=false;
+let VIEW=false,VPW='',VIEWERS=[],ME=null,ADMIN=false,READY=false,USERS=[],ADMINS=[],LAST={},firstMe=true,loaded=false;
 const nid=()=>Date.now()*100+Math.floor(Math.random()*100);
 const js=JSON.stringify;
 const taskDoc=k=>({id:k.id,t:k.t||'',d:k.d==null?-1:k.d,ps:k.ps||[],due:k.due||'',pr:k.pr==null?1:k.pr,s:k.s||0,cl:(k.cl||[]).map(c=>({t:c.t||'',d:!!c.d})),m:k.m||''});
@@ -311,10 +311,12 @@ function fail(e){console.error(e);toastMsg('保存できませんでした。'+(
 function showGate(h){gt.innerHTML=h;gt.hidden=false;app.hidden=true;bn.hidden=true}
 function gateHide(){gt.hidden=true;app.hidden=false;bn.hidden=false}
 function gateLoading(){showGate('<p class="note">読み込み中…</p>')}
-function gateLogin(msg){showGate('<div class="tk" style="--h:210"><h2 style="margin:0 0 8px;font-size:18px">大学祭 運営管理</h2><p>Googleアカウントでログインしてください。</p>'+(msg?'<p class="due late" style="white-space:normal">'+esc(msg)+'</p>':'')+'<button class="add on" onclick="FB.login()">Googleでログイン</button></div>')}
+const ONLYVIEW=/[?&]view\b/.test(location.search);
+function gateLogin(msg){showGate('<div class="tk" style="--h:210"><h2 style="margin:0 0 8px;font-size:18px">大学祭 運営管理</h2><p>Googleアカウントでログインしてください。</p>'+(msg?'<p class="due late" style="white-space:normal">'+esc(msg)+'</p>':'')+''+(ONLYVIEW?'':'<button class="add on" onclick="FB.login()">Googleでログイン</button><hr style="border:0;border-top:1px dashed var(--ln);margin:14px 0">')+'<b>🔑 パスワードで入る</b><div class="note" style="margin:2px 0 6px">アカウント登録なしで入れます。タスク・シフト・予算なども編集できます。</div><div class="er"><input type="password" id="vpw" placeholder="共有パスワード" style="flex:1"><button class="add on" onclick="FB.viewerLogin(vpw.value)">入る</button></div></div>')}
 function setOrgForGate(d){DB.D=(d&&d.D)||[];DB.P=(d&&d.P)||[]}
 function gateRegister(taken,msg){const free=DB.P.filter(p=>!taken.includes(p.id));
 showGate('<div class="tk" style="--h:210"><h2 style="margin:0 0 8px;font-size:18px">はじめての設定</h2><p>自分の名前を選んでください。選んだあとは、自分では変更できません(間違えたときは管理者に連絡してください)。</p>'+(msg?'<p class="due late" style="white-space:normal">'+esc(msg)+'</p>':'')+(free.length?'<div class="er"><select id="rg" style="flex:1">'+free.map(p=>'<option value="'+p.id+'">'+esc(p.n)+'('+esc(dn(p.d))+')</option>').join('')+'</select><button class="add on" onclick="FB.register(+rg.value)">この名前で登録</button></div>':'<p class="note">選べる名前がありません。管理者がメンバーを追加するまで待ってください。</p>')+(ADMIN?'<div class="er"><button class="add" onclick="FB.register(-1)">メンバー登録せず、管理者として入る</button></div>':'')+'<div class="er"><button onclick="FB.logout()">ログアウト</button></div></div>')}
+function setView(){VIEW=true;ME=null;ADMIN=true}
 function setSession(pid,adm){ME=pid>=0?pid:null;ADMIN=!!adm}
 function applyMe(){const m=DB.P.find(p=>p.id==ME);if(m){person=m.id;tdept=m.d;dept=m.d}}
 function afterSnap(){if(!loaded)return;const ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)){setTimeout(afterSnap,1500);return}draw()}
@@ -326,10 +328,15 @@ function onBudgetSnap(d){DB.cf=(d&&d.cf)||0;DB.bg=(d&&d.bg)||{};syncAll();afterS
 function onBentries(l){DB.B=l;syncAll();afterSnap()}
 function onAdmins(d){ADMINS=(d&&d.emails)||[];afterSnap()}
 function onUsers(l){USERS=l;afterSnap()}
-function adminUI(){let h='<div class="tk" style="--h:210"><b>管理者</b><div class="note" style="margin:2px 0 6px">最初の管理者(masemase.gakusai@gmail.com)は外せません。管理者は、すべてのデータを編集できます。</div>'
+function onViewerPw(d){VPW=(d&&d.pw)||'';afterSnap()}
+function onViewers(l){VIEWERS=l;afterSnap()}
+function setVpw(){const v=vpwi.value.trim();if(v.length<6){msg='パスワードは6文字以上にしてください。';draw();return}FB.set('config/viewer',{pw:v}).catch(fail);msg='';toastMsg('閲覧用パスワードを保存しました')}
+function endViewers(){VIEWERS.forEach(v=>FB.del('viewers/'+v.uid).catch(fail));toastMsg('パスワードで入っている人をすべて退室させました')}
+function adminUI(){if(VIEW)return'<div class="tk" style="--h:210"><span class="due">この画面は管理者(Googleログイン)だけが使えます。</span></div>';let h='<div class="tk" style="--h:210"><b>管理者</b><div class="note" style="margin:2px 0 6px">最初の管理者(masemase.gakusai@gmail.com)は外せません。管理者は、すべてのデータを編集できます。</div>'
 +ADMINS.map((e,i)=>'<div class="er"><span style="flex:1">'+esc(e)+'</span><button onclick="adminDel('+i+')">外す</button></div>').join('')
 +'<div class="er"><input type="text" id="ae" placeholder="追加するGoogleのメールアドレス"><button class="add" onclick="adminAdd()">追加</button></div></div>';
 h+='<div class="tk" style="--h:210"><b>登録済みのメンバー('+USERS.length+')</b><div class="note" style="margin:2px 0 6px">名前の選び間違いは「解除」すると、本人がもう一度選べます。</div>'+USERS.map(u=>{const p=DB.P.find(x=>x.id==u.pid);return'<div class="er"><span style="flex:1;font-size:13px">'+esc(p?p.n:'(メンバー登録なし)')+'<br><span class="due">'+esc(u.email||'')+'</span></span><button onclick="userDel(\''+u.uid+'\','+u.pid+')">解除</button></div>'}).join('')+'</div>';
+h+='<div class="tk" style="--h:330"><b>🔑 共有パスワード</b><div class="note" style="margin:2px 0 6px">このパスワードを知っている人は、アカウント登録なしで入れます。予算を含む全データを編集できます(管理者の追加やこのパスワードの変更だけはできません)。専用URLは、アプリのURLの後ろに <b>?view</b> を付けたものです。</div><div class="er"><input type="text" id="vpwi" value="'+esc(VPW)+'" placeholder="例: gakusai2027 など6文字以上" style="flex:1"><button class="add" onclick="setVpw()">保存</button></div><div class="er"><span class="due">現在パスワードで入っている人: '+VIEWERS.length+'人</span><button onclick="endViewers()">全員を退室させる</button></div><div class="note">パスワードを変えても、すでに入っている人はそのままです。止めたいときは「全員を退室させる」を押してください。</div></div>';
 return h}
 function adminAdd(){const v=ae.value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){msg='メールアドレスの形式を確認してください。';draw();return}if(ADMINS.includes(v))return;ADMINS=ADMINS.concat([v]);FB.set('config/admins',{emails:ADMINS}).catch(fail);msg='';draw()}
 function adminDel(i){ADMINS=ADMINS.filter((_,j)=>j!=i);FB.set('config/admins',{emails:ADMINS}).catch(fail);draw()}
@@ -348,7 +355,7 @@ bn.innerHTML=it.map(x=>{const on=x[0]==cur||(x[0]==1&&cur==3);return'<button cla
 let loStep=0;function lo(n){loStep=n;ft_()}
 function ft_(){ft.innerHTML=loStep?'<span class="note" style="margin:0">本当にログアウトしますか?</span><button class="lo y" onclick="FB.logout()">ログアウトする</button><button class="lo" onclick="lo(0)">やめる</button>':'<button class="lo" onclick="lo(1)">ログアウト</button>'}
 function topbar(){ft_();const m=DB.P.find(p=>p.id==ME);
-mebar.innerHTML=m?'<div class="me"><span class="av">'+esc(m.n.slice(0,1))+'</span><span><b>'+esc(m.n)+'</b><br><span class="due">'+esc(dn(m.d))+'</span></span>'+(ADMIN?'<span class="bdg">管理者</span>':'')+'</div>':(ADMIN?'<div class="me"><span class="av">管</span><b>管理者</b></div>':'');
+mebar.innerHTML=m?'<div class="me"><span class="av">'+esc(m.n.slice(0,1))+'</span><span><b>'+esc(m.n)+'</b><br><span class="due">'+esc(dn(m.d))+'</span></span>'+(ADMIN?'<span class="bdg">管理者</span>':'')+'</div>':(VIEW?'<div class="me"><span class="av">🔑</span><b>パスワードで入室中</b><span class="bdg">編集可</span></div>':(ADMIN?'<div class="me"><span class="av">管</span><b>管理者</b></div>':''));
 if(!m){nbar.innerHTML='';t2.textContent='🙋 マイページ';ph_();return}
 const l=DB.K.filter(k=>k.s<2&&k.due&&dd(k.due)<=3&&(k.ps.includes(m.id)||(!k.ps.length&&(k.d<0||k.d==m.d)))).sort(byDue);
 t2.textContent='🙋 マイページ'+(l.length?'('+l.length+')':'');ph_();
@@ -358,24 +365,28 @@ draw();
 </script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,signOut,signInAnonymously,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,getFirestore,doc,collection,onSnapshot,setDoc,getDoc,getDocs,deleteDoc,updateDoc,arrayUnion,writeBatch} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyCTK7ys9TMJuqQK3R1CgQuE-lo4sWNylxg",authDomain:"gakusai-task-schedule.firebaseapp.com",projectId:"gakusai-task-schedule",storageBucket:"gakusai-task-schedule.firebasestorage.app",messagingSenderId:"654102176669",appId:"1:654102176669:web:3f71a4e66ae9ddfc0b8574"};
 const fbApp=initializeApp(cfg);
 let db;try{db=initializeFirestore(fbApp,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){db=getFirestore(fbApp)}
 const auth=getAuth(fbApp);
 const D=p=>doc(db,...p.split('/'));
-let unsubs=[],isAdm=false;
+let unsubs=[],isAdm=false,viewerBusy=false;
 const errL=e=>{console.error(e);toastMsg('読み込みに失敗しました。'+(e&&e.code==='permission-denied'?'権限がありません。':'通信状況を確認してください。'))};
 function startSync(){gateLoading();
 unsubs.push(onSnapshot(D('org/main'),s=>onOrgSnap(s.data()),errL));
 unsubs.push(onSnapshot(collection(db,'tasks'),s=>onTasksSnap(s.docs.map(d=>d.data())),errL));
 unsubs.push(onSnapshot(collection(db,'notices'),s=>onNoticesSnap(s.docs.map(d=>d.data())),errL));
 unsubs.push(onSnapshot(collection(db,'shifts'),s=>{const m={};s.docs.forEach(d=>{m[d.id]=d.data()});onShiftSnap(m)},errL));
-if(isAdm){
+if(isAdm||VIEW){
 unsubs.push(onSnapshot(D('budget/main'),s=>onBudgetSnap(s.data()),errL));
 unsubs.push(onSnapshot(collection(db,'bentries'),s=>onBentries(s.docs.map(d=>d.data())),errL));
+}
+if(isAdm){
 unsubs.push(onSnapshot(D('config/admins'),s=>onAdmins(s.data()),errL));
+unsubs.push(onSnapshot(D('config/viewer'),s=>onViewerPw(s.data()),errL));
+unsubs.push(onSnapshot(collection(db,'viewers'),s=>onViewers(s.docs.map(d=>Object.assign({uid:d.id},d.data()))),errL));
 unsubs.push(onSnapshot(collection(db,'users'),s=>onUsers(s.docs.map(d=>Object.assign({uid:d.id},d.data()))),errL));}}
 async function showRegister(msg){try{const o=await getDoc(D('org/main'));setOrgForGate(o.data());const c=await getDocs(collection(db,'claims'));gateRegister(c.docs.map(d=>+d.id),msg)}catch(e){gateLogin('読み込めませんでした: '+(e.code||e.message))}}
 async function enter(u){let us;try{us=await getDoc(D('users/'+u.uid))}catch(e){gateLogin('読み込めませんでした: '+(e.code||e.message));return}
@@ -383,14 +394,18 @@ if(!us.exists()){setSession(-1,isAdm);await showRegister();return}
 setSession(us.data().pid,isAdm);startSync()}
 window.FB={
 login:async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'){gateLogin('ポップアップがブロックされました。Safariの設定でポップアップを許可するか、LINEなどのアプリ内ブラウザではなくSafari(またはChrome)でURLを開いて、もう一度押してください。');return}if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){gateLogin();return}gateLogin(e.code==='auth/unauthorized-domain'?'このアドレスはFirebaseで許可されていません。管理者に連絡してください。':'ログインできませんでした('+(e.code||e.message)+')')}},
+viewerLogin:async pw=>{pw=(pw||'').trim();if(!pw){gateLogin('パスワードを入力してください。');return}viewerBusy=true;isAdm=false;gateLoading();
+try{const c=await signInAnonymously(auth);await setDoc(D('viewers/'+c.user.uid),{pw:pw});viewerBusy=false;setView();startSync()}
+catch(e){viewerBusy=false;console.error(e);try{await signOut(auth)}catch(_){}gateLogin(e.code==='permission-denied'?'パスワードが違います。':(e.code==='auth/operation-not-allowed'||e.code==='auth/admin-restricted-operation'?'閲覧機能がまだ有効になっていません(管理者の設定が必要です)。':'ログインできませんでした('+(e.code||e.message)+')'))}},
 logout:()=>signOut(auth).then(()=>location.reload()),
 set:(p,o)=>setDoc(D(p),o),
 del:p=>deleteDoc(D(p)),
 markRead:(id,pid)=>updateDoc(D('notices/'+id),{r:arrayUnion(pid)}),
 register:async pid=>{const u=auth.currentUser;if(!u)return;try{const b=writeBatch(db);if(pid>=0)b.set(D('claims/'+pid),{uid:u.uid,email:u.email,at:Date.now()});b.set(D('users/'+u.uid),{email:u.email,pid:pid,at:Date.now()});await b.commit();await enter(u)}catch(e){console.error(e);await showRegister(e.code==='permission-denied'?'この名前はすでに使われています。別の名前を選ぶか、管理者に連絡してください。':'登録できませんでした。通信状況を確認してください。')}}
 };
-onAuthStateChanged(auth,async u=>{unsubs.forEach(f=>f());unsubs=[];
+onAuthStateChanged(auth,async u=>{if(viewerBusy)return;unsubs.forEach(f=>f());unsubs=[];
 if(!u){gateLogin();return}
+if(u.isAnonymous){try{const v=await getDoc(D('viewers/'+u.uid));if(v.exists()){setView();startSync()}else{await signOut(auth)}}catch(e){gateLogin('読み込めませんでした: '+(e.code||e.message))}return}
 gateLoading();isAdm=false;
 try{await getDoc(D('config/admins'));isAdm=true}catch(e){if(e.code!=='permission-denied'){gateLogin('通信できませんでした。電波の良い場所で開き直してください。');return}}
 await enter(u)});
